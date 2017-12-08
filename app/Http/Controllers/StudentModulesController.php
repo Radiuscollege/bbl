@@ -2,16 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Cohort;
+use App\StudentModules;
 use Illuminate\Http\Request;
 
-class CohortController extends Controller
+class StudentModulesController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('teacher');
-    }
     /**
      * Display a listing of the resource.
      *
@@ -19,7 +14,7 @@ class CohortController extends Controller
      */
     public function index()
     {
-        return Cohort::all();
+        //
     }
 
     /**
@@ -40,28 +35,27 @@ class CohortController extends Controller
      */
     public function store(Request $request)
     {
-        $cohort = Cohort::create($request->all());
-        return $cohort;
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Cohort  $cohort
+     * @param  \App\StudentModules  $studentModules
      * @return \Illuminate\Http\Response
      */
-    public function show(Cohort $cohort)
+    public function show(StudentModules $studentModules)
     {
-        return Cohort::findOrFail($id);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Cohort  $cohort
+     * @param  \App\StudentModules  $studentModules
      * @return \Illuminate\Http\Response
      */
-    public function edit(Cohort $cohort)
+    public function edit(StudentModules $studentModules)
     {
         //
     }
@@ -70,20 +64,21 @@ class CohortController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Cohort  $cohort
+     * @param  \App\StudentModules  $studentModules
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Cohort $cohort)
+    public function update(Request $request, StudentModules $studentModules)
     {
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Cohort  $cohort
+     * @param  \App\StudentModules  $studentModules
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cohort $cohort)
+    public function destroy(StudentModules $studentModules)
     {
         //
     }
