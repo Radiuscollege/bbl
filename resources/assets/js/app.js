@@ -5,9 +5,9 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 window.Vue = require('vue');
+window.axios = require('axios');
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -16,6 +16,9 @@ window.Vue = require('vue');
  */
 
 Vue.component('breadcrumb', require('./components/Breadcrumb.vue'));
+Vue.component('cohort', require('./components/Cohort.vue'));
+Vue.component('module', require('./components/Module.vue'));
+Vue.component('moduleform', require('./components/ModuleForm.vue'));
 
 const app = new Vue({
     el: '#app'

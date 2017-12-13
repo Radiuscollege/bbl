@@ -17,7 +17,7 @@ class CreateModulesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('short_description');
-            $table->string('long_description');
+            $table->text('long_description');
             $table->integer('week_duration');
             $table->timestamps();
         });

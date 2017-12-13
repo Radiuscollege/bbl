@@ -40,8 +40,23 @@ class CohortController extends Controller
      */
     public function store(Request $request)
     {
-        $cohort = Cohort::create($request->all());
-        return $cohort;
+        $validatedData = $request->validate([
+            'name' => 'required|max:40',
+        ]);
+        //if(auth::user()->type == 'teacher')
+        //return back();
+        //$cohort = Cohort::create($request->all());
+        return Cohort::create([ 'name' => request('name') ]);
+        //dd($request);
+
+        //$cohort = new Cohort;
+        
+        //$cohort->name = $request->name();
+        //$cohort->save();
+
+        //return $cohort;
+        //return response()->json($cohort, 201);
+        //return back()->with('success', 'Cohort created succesfully');
     }
 
     /**

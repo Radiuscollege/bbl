@@ -14,6 +14,11 @@ class ModuleController extends Controller
         $this->middleware('teacher');
     }
 
+    public function add()
+    {
+        return view('module');
+    }
+
     /**
      * Display a listing of the resource.
      *

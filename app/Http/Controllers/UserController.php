@@ -21,7 +21,7 @@ class UserController extends Controller
             }
             else
             {
-                return view('student');
+                return view('studenthome');
             }
         }
         else
