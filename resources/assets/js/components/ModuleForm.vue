@@ -1,27 +1,27 @@
 <template>
-  <form class="form-horizontal">
+  <form class="form-horizontal was-validated">
     <div class="form-group row">
       <label for="inputName" class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="name" type="text" placeholder="Naam">
+        <input class="form-control" v-model="name" type="text" placeholder="Naam" required>
       </div>
     </div>
     <div class="form-group row">
       <label for="inputSubDescription" class="col-sm-2 col-form-label">Sub beschrijving</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="subdescription" type="text" placeholder="Sub beschrijving">
+        <input class="form-control" v-model="subDescription" type="text" placeholder="Sub beschrijving">
       </div>
     </div>
       <div class="form-group row">
       <label for="inputPeriod" class="col-sm-2 col-form-label">Duur in weken</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="period" type="text" placeholder="Duur in weken">
+        <input class="form-control" v-model="weekDuration" type="number" min="0" max="100" placeholder="Duur in weken" required>
       </div>
     </div>
     <div class="form-group row">
-      <label for="inputPeriod" class="col-sm-2 col-form-label">Cohort</label>
+      <label for="cohort" class="col-sm-2 col-form-label">Cohort</label>
       <div class="col-sm-5">
-        <multiselect
+        <multiselect v-model="selectedObjects"
           :options="cohorts"
           :multiple="true" 
           label="name" 
@@ -34,7 +34,7 @@
     </medium-editor>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button type="submit" class="btn btn-primary">Opslaan</button>
+        <button class="btn btn-primary" v-on:click="saveModule">Opslaan</button>
       </div>
     </div>
   </form>
@@ -46,10 +46,12 @@ import Multiselect from "vue-multiselect";
 
 export default {
   name: "cohort",
-  data() {
+  data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
-      cohort: "",
+      name: "",
+      subDescription: "",
+      weekDuration: null,
       text: "",
       selectedObjects: [],
       selectedIds: []
@@ -72,10 +74,25 @@ export default {
     processEditOperation: function(operation) {
       this.text = operation.api.origElements.innerHTML;
     },
-    getCohorts() {
+    getCohorts: function() {
       axios.get("api/cohort").then(res => {
         this.cohorts = res.data;
       });
+    },
+    saveModule: function(e) {
+      e.preventDefault();
+      axios
+        .post("/api/module", {
+          name: this.name,
+          subDescription: this.subDescription,
+          weekDuration: this.weekDuration,
+          cohorts: this.selectedIds,
+          longDescription: this.text
+        })
+        .then(res => {
+          console.log("success");
+        })
+        .catch(err => console.error(err));
     }
   }
 };

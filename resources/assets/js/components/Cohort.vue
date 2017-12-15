@@ -13,28 +13,22 @@
 <script>
 export default {
   name: "cohort",
-  data() {
+  data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
       cohort: ""
     };
   },
-  mounted() {
+  mounted: function() {
     this.getCohorts();
   },
   methods: {
-    addCohort: function(event) {
-      //post API
-      if (event) {
-        alert(this.cohort);
-      }
-    },
-    getCohorts() {
+    getCohorts: function() {
       axios.get("api/cohort").then(res => {
         this.cohorts = res.data;
       });
     },
-    createCohort() {
+    createCohort: function() {
       axios.post(
           "api/cohort",
           {

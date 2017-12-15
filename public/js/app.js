@@ -1092,7 +1092,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 window.Vue = __webpack_require__(17);
+
+/**
+ * We'll load the axios HTTP library which allows us to easily issue requests
+ * to our Laravel back-end. This library automatically handles sending the
+ * CSRF token as a header based on the value of the "XSRF" token cookie.
+ */
+
 window.axios = __webpack_require__(20);
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+/**
+ * Next we will register the CSRF Token as a common header with Axios so that
+ * all outgoing HTTP requests automatically have it attached. This is just
+ * a simple convenience so we don't have to attach every token manually.
+ */
+
+var token = document.head.querySelector('meta[name="csrf-token"]');
+
+if (token) {
+  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -13756,14 +13779,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   mounted: function mounted() {
     this.getCohorts();
   },
-
   methods: {
-    addCohort: function addCohort(event) {
-      //post API
-      if (event) {
-        alert(this.cohort);
-      }
-    },
     getCohorts: function getCohorts() {
       var _this = this;
 
@@ -14055,13 +14071,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   data: function data() {
     return {
       cohorts: [{ id: "", name: "" }],
-      cohort: "",
+      name: "",
+      subDescription: "",
+      weekDuration: null,
       text: "",
       selectedObjects: [],
       selectedIds: []
     };
   },
-
   watch: {
     selectedObjects: function selectedObjects(newValues) {
       this.selectedIds = newValues.map(function (obj) {
@@ -14087,6 +14104,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
       axios.get("api/cohort").then(function (res) {
         _this.cohorts = res.data;
+      });
+    },
+    saveModule: function saveModule(e) {
+      e.preventDefault();
+      axios.post("/api/module", {
+        name: this.name,
+        subDescription: this.subDescription,
+        weekDuration: this.weekDuration,
+        cohorts: this.selectedIds,
+        longDescription: this.text
+      }).then(function (res) {
+        console.log("success");
+      }).catch(function (err) {
+        return console.error(err);
       });
     }
   }
@@ -24650,7 +24681,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "form",
-    { staticClass: "form-horizontal" },
+    { staticClass: "form-horizontal was-validated" },
     [
       _c("div", { staticClass: "form-group row" }, [
         _c(
@@ -24673,7 +24704,7 @@ var render = function() {
               }
             ],
             staticClass: "form-control",
-            attrs: { type: "text", placeholder: "Naam" },
+            attrs: { type: "text", placeholder: "Naam", required: "" },
             domProps: { value: _vm.name },
             on: {
               input: function($event) {
@@ -24703,19 +24734,19 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.subdescription,
-                expression: "subdescription"
+                value: _vm.subDescription,
+                expression: "subDescription"
               }
             ],
             staticClass: "form-control",
             attrs: { type: "text", placeholder: "Sub beschrijving" },
-            domProps: { value: _vm.subdescription },
+            domProps: { value: _vm.subDescription },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.subdescription = $event.target.value
+                _vm.subDescription = $event.target.value
               }
             }
           })
@@ -24738,19 +24769,25 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.period,
-                expression: "period"
+                value: _vm.weekDuration,
+                expression: "weekDuration"
               }
             ],
             staticClass: "form-control",
-            attrs: { type: "text", placeholder: "Duur in weken" },
-            domProps: { value: _vm.period },
+            attrs: {
+              type: "number",
+              min: "0",
+              max: "100",
+              placeholder: "Duur in weken",
+              required: ""
+            },
+            domProps: { value: _vm.weekDuration },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.period = $event.target.value
+                _vm.weekDuration = $event.target.value
               }
             }
           })
@@ -24760,10 +24797,7 @@ var render = function() {
       _c("div", { staticClass: "form-group row" }, [
         _c(
           "label",
-          {
-            staticClass: "col-sm-2 col-form-label",
-            attrs: { for: "inputPeriod" }
-          },
+          { staticClass: "col-sm-2 col-form-label", attrs: { for: "cohort" } },
           [_vm._v("Cohort")]
         ),
         _vm._v(" "),
@@ -24777,6 +24811,13 @@ var render = function() {
                 multiple: true,
                 label: "name",
                 "track-by": "id"
+              },
+              model: {
+                value: _vm.selectedObjects,
+                callback: function($$v) {
+                  _vm.selectedObjects = $$v
+                },
+                expression: "selectedObjects"
               }
             })
           ],
@@ -24791,27 +24832,20 @@ var render = function() {
         on: { edit: _vm.processEditOperation }
       }),
       _vm._v(" "),
-      _vm._m(0)
+      _c("div", { staticClass: "form-group row" }, [
+        _c("div", { staticClass: "col-sm-10" }, [
+          _c(
+            "button",
+            { staticClass: "btn btn-primary", on: { click: _vm.saveModule } },
+            [_vm._v("Opslaan")]
+          )
+        ])
+      ])
     ],
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c(
-          "button",
-          { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-          [_vm._v("Opslaan")]
-        )
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {

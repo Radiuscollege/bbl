@@ -1,6 +1,5 @@
-@extends('layouts.app')
-@section('menu')
-    <div class="col-12 col-md-8">
+@extends('layouts.app') @section('menu')
+<div class="col-12 col-md-8">
 	<nav aria-label="breadcrumb" role="navigation">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item active">
@@ -10,8 +9,9 @@
 		</ol>
 	</nav>
 </div>
-@endsection
-@section('content')
+@endsection @section('content')
 <cohort></cohort>
-<button class="btn btn-primary" href="{{ url('/addmodule') }}">Module toevoegen</a>
+<a class="btn btn-primary" href="{{ url('/addmodule') }}">
+	<span>Module toevoegen</span>
+</a>
 @endsection

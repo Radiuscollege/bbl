@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCohortsTable extends Migration
+class CohortModule extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateCohortsTable extends Migration
      */
     public function up()
     {
-        Schema::create('cohorts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->unique();
+        Schema::create('cohort_module', function (Blueprint $table) {
+            $table->integer('module_id')->unsigned();
+            $table->integer('cohort_id')->unsigned();
             $table->timestamps();
+            
+            $table->primary(['module_id', 'cohort_id']);
         });
     }
 
@@ -27,6 +29,6 @@ class CreateCohortsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cohorts');
+        Schema::dropIfExists('cohort_module');
     }
 }

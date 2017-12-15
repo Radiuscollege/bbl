@@ -47,7 +47,23 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|max:40',
+            'sub_description' => 'max:80',
+            'week_duration' => 'required|numeric'
+        ]);
+
+        $module = Module::create([
+            'name' => request('name'),
+            'sub_description' => request('subDescription'),
+            'week_duration' => request('weekDuration'),
+            'long_description' => request('longDescription')
+        ]);
+
+        $cohorts = request('cohorts');
+        $module->cohorts()->attach($cohorts);
+
+        return view('modulelist');
     }
 
     /**

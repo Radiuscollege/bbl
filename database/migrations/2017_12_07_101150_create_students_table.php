@@ -22,7 +22,7 @@ class CreateStudentsTable extends Migration
             $table->string('firstname');
             $table->string('prefix');
             $table->string('lastname');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->date('started_on');
             $table->boolean('graduated');
             $table->softDeletes('deleted_at');
