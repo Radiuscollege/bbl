@@ -10,6 +10,10 @@ class Module extends Model
         'name',  'sub_description', 'week_duration', 'long_description'
     ];
 
+    protected $hidden = [
+        'id', 'created_at', 'updated_at'
+    ];
+
     public function cohorts()
     {
         return $this->belongsToMany('App\Cohort');

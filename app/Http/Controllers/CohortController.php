@@ -43,7 +43,7 @@ class CohortController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|max:40',
         ]);
-
+                
         return Cohort::create([ 'name' => request('name') ]);
     }
 

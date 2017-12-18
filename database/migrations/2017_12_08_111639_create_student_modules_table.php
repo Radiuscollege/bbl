@@ -19,7 +19,7 @@ class CreateStudentModulesTable extends Migration
             $table->foreign('student_id')->references('id')->on('students');
             $table->integer('module_id')->unsigned();
             $table->foreign('module_id')->references('id')->on('modules');
-            $table->integer('mark');
+            $table->integer('mark')->nullable();
             $table->boolean('done');
             $table->string('approved_by');
             $table->foreign('approved_by')->references('id')->on('users');

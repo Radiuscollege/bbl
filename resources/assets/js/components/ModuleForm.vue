@@ -45,7 +45,7 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Multiselect from "vue-multiselect";
 
 export default {
-  name: "cohort",
+  name: "moduleform",
   data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
@@ -75,7 +75,7 @@ export default {
       this.text = operation.api.origElements.innerHTML;
     },
     getCohorts: function() {
-      axios.get("api/cohort").then(res => {
+      axios.get("/api/cohort").then(res => {
         this.cohorts = res.data;
       });
     },
@@ -90,7 +90,7 @@ export default {
           longDescription: this.text
         })
         .then(res => {
-          console.log("success");
+          document.location.href = 'module';
         })
         .catch(err => console.error(err));
     }

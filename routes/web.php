@@ -19,6 +19,12 @@ Route::get('/amoclient/ready', function () {
 
 Route::get('/student', 'StudentController@index')->name('studentlist');
 
+Route::get('/addstudent', 'StudentController@add')->name('addstudent');
+
+Route::post('/api/student', 'StudentController@store')->name('addstudent');
+
+Route::get('/api/student', 'StudentController@showall')->name('getstudent');
+
 Route::get('/student/{id}', 'StudentController@show')->name('student');
 
 Route::get('/statistics', function () {
@@ -26,7 +32,6 @@ Route::get('/statistics', function () {
 })->name('statistics');
 
 Route::get('/module', 'ModuleController@index')->name('modulelist');
-
 
 Route::get('/module/{id}', 'ModuleController@show')->name('module');
 

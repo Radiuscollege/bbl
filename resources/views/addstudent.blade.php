@@ -4,14 +4,12 @@
         <nav aria-label="breadcrumb" role="navigation">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item active"><a href="{{ url('/') }}">Home</a></li>
-				<li class="breadcrumb-item active" aria-current="page">Studenten</li>
+				<li class="breadcrumb-item active"><a href="{{ url('/student') }}">Studenten</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Toevoegen</li>
             </ol>
         </nav>
     </div>
 @endsection
 @section('content')
-<a class="btn btn-primary" href="{{ url('/addstudent') }}">
-	<span>Student toevoegen</span>
-</a>
-<studentlist></studentlist>
+<studentform></studentform>
 @endsection

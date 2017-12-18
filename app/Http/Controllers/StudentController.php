@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Student;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class StudentController extends Controller
 {
@@ -11,6 +12,16 @@ class StudentController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('teacher');
+    }
+
+    public function add()
+    {
+        return view('addstudent');
+    }
+
+    public function showall()
+    {
+        return Student::with('cohort')->get();
     }
 
     /**
@@ -41,7 +52,37 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'studentNumber' => 'required|max:20',
+            'cohorts' => 'required',
+            'firstName' => 'required|max:40',
+            'prefix' => 'max:40',
+            'lastName' => 'required|max:40',
+            'date' => 'required|date',
+        ]);
+
+        $date = strtotime(request('date'));
+
+        $finalDate = Carbon::createFromTimestamp($date)->toDateString();
+
+        $student = Student::create([
+            'student_id' => request('studentNumber'),
+            'cohort_id' => request('cohorts'),
+            'first_name' => request('firstName'),
+            'prefix' => request('prefix'),
+            'last_name' => request('lastName'),
+            'started_on' => $finalDate,
+            'graduated' => false,
+
+        ]);
+
+        $cohorts = request('cohorts');
+
+        $stu = Student::find($student->id);
+
+        $stu->cohort()->associate($cohorts);
+
+        return;
     }
 
     /**

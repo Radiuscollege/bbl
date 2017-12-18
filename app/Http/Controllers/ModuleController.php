@@ -49,8 +49,8 @@ class ModuleController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|max:40',
-            'sub_description' => 'max:80',
-            'week_duration' => 'required|numeric'
+            'subDescription' => 'max:80',
+            'weekDuration' => 'required|numeric'
         ]);
 
         $module = Module::create([
@@ -63,7 +63,7 @@ class ModuleController extends Controller
         $cohorts = request('cohorts');
         $module->cohorts()->attach($cohorts);
 
-        return view('modulelist');
+        return redirect('module');
     }
 
     /**

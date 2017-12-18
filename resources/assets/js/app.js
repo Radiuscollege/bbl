@@ -42,6 +42,8 @@ Vue.component('breadcrumb', require('./components/Breadcrumb.vue'));
 Vue.component('cohort', require('./components/Cohort.vue'));
 Vue.component('module', require('./components/Module.vue'));
 Vue.component('moduleform', require('./components/ModuleForm.vue'));
+Vue.component('studentform', require('./components/StudentForm.vue'));
+Vue.component('studentlist', require('./components/StudentList.vue'));
 
 const app = new Vue({
     el: '#app'
