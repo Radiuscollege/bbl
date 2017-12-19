@@ -14,4 +14,5 @@
 <a class="btn btn-primary" href="{{ url('/addmodule') }}">
 	<span>Module toevoegen</span>
 </a>
+<modulelist></modulelist>
 @endsection

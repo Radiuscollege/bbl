@@ -23,7 +23,7 @@ Route::get('/addstudent', 'StudentController@add')->name('addstudent');
 
 Route::post('/api/student', 'StudentController@store')->name('addstudent');
 
-Route::get('/api/student', 'StudentController@showall')->name('getstudent');
+Route::get('/api/student', 'StudentController@showall')->name('getstudents');
 
 Route::get('/student/{id}', 'StudentController@show')->name('student');
 
@@ -32,6 +32,8 @@ Route::get('/statistics', function () {
 })->name('statistics');
 
 Route::get('/module', 'ModuleController@index')->name('modulelist');
+
+Route::get('/api/module', 'ModuleController@showall')->name('getmodules');
 
 Route::get('/module/{id}', 'ModuleController@show')->name('module');
 

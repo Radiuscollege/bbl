@@ -18,6 +18,10 @@ class ModuleController extends Controller
     {
         return view('module');
     }
+    public function showall()
+    {
+        return Module::all();
+    }
 
     /**
      * Display a listing of the resource.

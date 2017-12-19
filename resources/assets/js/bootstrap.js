@@ -1,4 +1,3 @@
-
 window._ = require('lodash');
 
 /**
@@ -7,10 +6,13 @@ window._ = require('lodash');
  * code may be modified to fit the specific needs of your application.
  */
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import 'popper.js';
+
 try {
     window.$ = window.jQuery = require('jquery');
-
-    require('bootstrap');
+    window.Popper = require('popper.js').default;
 } catch (e) {}
 
 /**
