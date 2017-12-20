@@ -18,9 +18,29 @@ class ModuleController extends Controller
     {
         return view('module');
     }
+
     public function showall()
     {
         return Module::all();
+    }
+
+    public function loadmodule($id)
+    {
+        return Module::with('cohorts')->find($id);
+    }
+
+    public function editmodule(Request $request, $id)
+    {
+        $module = Module::findOrFail($id);
+        $module->name = request('name');
+        $module->sub_description = request('subDescription');
+        $module->week_duration = request('weekDuration');
+        $module->long_description = request('longDescription');
+
+        $cohorts = request('cohorts');
+        $module->cohorts()->sync($cohorts);
+        $module->save();
+        return $module;
     }
 
     /**
@@ -76,9 +96,9 @@ class ModuleController extends Controller
      * @param  \App\Module  $module
      * @return \Illuminate\Http\Response
      */
-    public function show(Module $module)
+    public function show()
     {
-        //
+        return view('editmodule');
     }
 
     /**

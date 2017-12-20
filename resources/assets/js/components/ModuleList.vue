@@ -8,12 +8,12 @@
           <p class="card-text">{{module.sub_description}}</p>
         </div>
         <div class="card-footer bg-transparent border-success">
-          <a data-toggle="collapse" href="#collapse" aria-expanded="true" aria-controls="collapse">
+          <a data-toggle="collapse" :href='"#collapse" + module.id'  aria-expanded="true" :aria-controls='"collapse" + module.id'>
             Uitleg
           </a>
-          <a class="btn btn-primary float-right" v-bind:href="'/student/' + module.id" role="button">Wijzigen</a>
+          <a class="btn btn-primary float-right" :href="'/module/' + module.id" role="button">Wijzigen</a>
           <button v-on:click="editModule" class="btn btn-danger float-right">Verwijderen</button>
-          <div id="collapse" class="collapse" role="tabpanel" aria-labelledby="heading" data-parent="#accordion">
+          <div :id="'collapse' + module.id" class="collapse" role="tabpanel" aria-labelledby="heading" data-parent="#accordion">
             <div class="card-body">
               <medium-editor :text='module.long_description' :options='options'>
               </medium-editor>
@@ -55,7 +55,7 @@ export default {
     "medium-editor": editor,
     FontAwesomeIcon
   },
-  mounted() {
+  created: function() {
     this.getModules();
   },
   methods: {

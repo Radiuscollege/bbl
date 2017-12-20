@@ -19,7 +19,7 @@ export default {
   components: {
     FontAwesomeIcon
   },
-  mounted() {
+  created: function() {
     this.getStudents();
   },
   methods: {

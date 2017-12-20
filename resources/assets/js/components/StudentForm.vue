@@ -79,7 +79,7 @@ export default {
     Multiselect,
     Datepicker
   },
-  mounted() {
+  created: function() {
     this.getCohorts();
   },
   methods: {

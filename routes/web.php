@@ -35,11 +35,15 @@ Route::get('/module', 'ModuleController@index')->name('modulelist');
 
 Route::get('/api/module', 'ModuleController@showall')->name('getmodules');
 
-Route::get('/module/{id}', 'ModuleController@show')->name('module');
+Route::get('/module/{id}', 'ModuleController@show')->name('editmodule');
 
 Route::get('/addmodule', 'ModuleController@add')->name('moduleform');
 
 Route::post('/api/module', 'ModuleController@store')->name('addmodule');
+
+Route::get('/api/module/{id}', 'ModuleController@loadmodule')->name('showmodule');
+
+Route::put('/api/module/{id}', 'ModuleController@editmodule')->name('editmodule');
 
 Route::post('/api/cohort', 'CohortController@store')->name('addcohort');
 

@@ -9,14 +9,14 @@
     </div>
 @endsection 
 @section('content')
-<div class="row links-container justify-content-center">
-	<a class="btn btn-outline-primary" href="{{ url('/module') }}">
+<div class="row links-container justify-content-center h-50">
+	<a class="btn btn-outline-primary my-auto" href="{{ url('/module') }}">
 		<span>Modules</span>
 	</a>
-	<a class="btn btn-outline-primary" href="{{ url('/student') }}">
+	<a class="btn btn-outline-primary my-auto" href="{{ url('/student') }}">
 		<span>Studenten</span>
 	</a>
-	<a class="btn btn-outline-primary" href="{{ url('/statistics') }}">
+	<a class="btn btn-outline-primary my-auto" href="{{ url('/statistics') }}">
 		<span>Statistieken</span>
 	</a>
 </div>

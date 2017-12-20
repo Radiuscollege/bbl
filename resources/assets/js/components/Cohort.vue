@@ -19,7 +19,7 @@ export default {
       cohort: ""
     };
   },
-  mounted: function() {
+  created: function() {
     this.getCohorts();
   },
   methods: {

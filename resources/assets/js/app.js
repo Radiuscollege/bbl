@@ -15,10 +15,10 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('breadcrumb', require('./components/Breadcrumb.vue'));
 Vue.component('cohort', require('./components/Cohort.vue'));
 Vue.component('module', require('./components/Module.vue'));
 Vue.component('moduleform', require('./components/ModuleForm.vue'));
+Vue.component('editmoduleform', require('./components/EditModuleForm.vue'));
 Vue.component('modulelist', require('./components/ModuleList.vue'));
 Vue.component('studentform', require('./components/StudentForm.vue'));
 Vue.component('studentlist', require('./components/StudentList.vue'));
