@@ -61,7 +61,7 @@ export default {
       studentNumber: "",
       firstName: "",
       prefix: "",
-      surName: "",
+      lastName: "",
       date: null,
       selectedObjects: [],
       selectedIds: [],

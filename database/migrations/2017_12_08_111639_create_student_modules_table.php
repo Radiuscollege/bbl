@@ -20,11 +20,10 @@ class CreateStudentModulesTable extends Migration
             $table->integer('module_id')->unsigned();
             $table->foreign('module_id')->references('id')->on('modules');
             $table->integer('mark')->nullable();
-            $table->boolean('done');
-            $table->string('approved_by');
+            $table->string('approved_by')->nullable();
             $table->foreign('approved_by')->references('id')->on('users');
-            $table->date('begin_date');
-            $table->date('finish_date');
+            $table->date('begin_date')->nullable();
+            $table->date('finish_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

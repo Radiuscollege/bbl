@@ -27,6 +27,10 @@ Route::get('/api/student', 'StudentController@showall')->name('getstudents');
 
 Route::get('/student/{id}', 'StudentController@show')->name('student');
 
+Route::get('/api/studentmodule', 'StudentModulesController@index')->name('getstudentmodules');
+
+Route::post('/api/studentmodule/toggle/{id}', 'StudentModulesController@toggle');
+
 Route::get('/statistics', function () {
     return view('statistics');
 })->name('statistics');

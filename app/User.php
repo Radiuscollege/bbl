@@ -27,6 +27,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function getID()
+    {
+        return auth()->user()->id;
+    }
 
     public function isTeacher()
     {

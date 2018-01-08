@@ -18,4 +18,9 @@ class Module extends Model
     {
         return $this->belongsToMany('App\Cohort');
     }
+    
+    public function studentModules()
+    {
+        return $this->hasMany('App\StudentModules');
+    }
 }

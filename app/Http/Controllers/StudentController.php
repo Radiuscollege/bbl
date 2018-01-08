@@ -82,6 +82,31 @@ class StudentController extends Controller
 
         $stu->cohort()->associate($cohorts);
 
+        //ik moet eerst alle module ID's krijgen in de cohort_module
+        //dan kan ik met die modules een array in de student_modules voeren
+
+        //is hier niks wat laravel voor mij doet?
+
+
+
+        //Cohort::where('active', request('cohorts'))
+        //('active', 1)
+        //foreach ($cohort as request('cohorts')) {
+        //    # code...
+        //}
+        /*
+        $studentModules = StudentModule::create([
+            'student_id' => request('studentNumber'),
+            'module_id' => request('cohorts'),
+            'first_name' => request('firstName'),
+            'prefix' => request('prefix'),
+            'last_name' => request('lastName'),
+            'started_on' => $finalDate,
+            'graduated' => false,
+
+        ]);
+        */
+
         return;
     }
 

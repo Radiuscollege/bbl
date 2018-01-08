@@ -22,6 +22,7 @@ Vue.component('editmoduleform', require('./components/EditModuleForm.vue'));
 Vue.component('modulelist', require('./components/ModuleList.vue'));
 Vue.component('studentform', require('./components/StudentForm.vue'));
 Vue.component('studentlist', require('./components/StudentList.vue'));
+Vue.component('studentprogress', require('./components/StudentProgress.vue'));
 
 const app = new Vue({
     el: '#app'

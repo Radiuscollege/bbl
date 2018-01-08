@@ -14,11 +14,11 @@ class CohortModule extends Migration
     public function up()
     {
         Schema::create('cohort_module', function (Blueprint $table) {
-            $table->integer('module_id')->unsigned();
             $table->integer('cohort_id')->unsigned();
+            $table->integer('module_id')->unsigned();
             $table->timestamps();
             
-            $table->primary(['module_id', 'cohort_id']);
+            $table->primary(['cohort_id', 'module_id']);
         });
     }
 

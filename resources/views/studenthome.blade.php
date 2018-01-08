@@ -9,4 +9,5 @@
     </div>
 @endsection
 @section('content')
+<studentprogress></studentprogress>
 @endsection

@@ -13,19 +13,15 @@ class UserController extends Controller
     
     public function index()
     {
-        if (Auth::check())
-        {
-            if (Auth::user()->isTeacher())
-            {
+        if (Auth::check()) {
+            if (Auth::user()->isTeacher()) {
                 return view('teacher');
             }
-            else
-            {
+            else {
                 return view('studenthome');
             }
         }
-        else
-        {
+        else {
             return redirect('amoclient/redirect');
         }
     }
