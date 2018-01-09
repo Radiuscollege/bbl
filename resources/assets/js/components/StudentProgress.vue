@@ -86,9 +86,6 @@ export default {
       axios
         .post("/api/studentmodule/toggle/" + moduleID, { began: toggle })
         .then(res => {});
-    },
-    getBool: function(date) {
-      return (date = !null);
     }
   }
 };

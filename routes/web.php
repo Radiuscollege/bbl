@@ -25,9 +25,13 @@ Route::post('/api/student', 'StudentController@store')->name('addstudent');
 
 Route::get('/api/student', 'StudentController@showall')->name('getstudents');
 
-Route::get('/student/{id}', 'StudentController@show')->name('student');
+Route::get('/student/{id}', 'StudentController@show');
 
-Route::get('/api/studentmodule', 'StudentModulesController@index')->name('getstudentmodules');
+Route::get('/api/student/{id}', 'StudentController@loadstudent');
+
+Route::get('/api/studentmodule', 'StudentModulesController@index');
+
+Route::get('/api/studentmodule/{id}', 'StudentModulesController@getstudent');
 
 Route::post('/api/studentmodule/toggle/{id}', 'StudentModulesController@toggle');
 

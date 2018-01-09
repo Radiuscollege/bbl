@@ -58,6 +58,15 @@ class StudentModulesController extends Controller
         return $modules;
     }
 
+    public function getstudent($id)
+    {
+        $cohort = Student::find($id)->pluck('cohort_id');
+
+        $modules = Cohort::where('id', $cohort)->with('modules.studentModules')->get();
+
+        return $modules;
+    }
+
     /**
      * Show the form for creating a new resource.
      *

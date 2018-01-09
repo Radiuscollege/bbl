@@ -24,6 +24,11 @@ class StudentController extends Controller
         return Student::with('cohort')->get();
     }
 
+    public function loadstudent(Student $student, $id)
+    {
+        return Student::find($id);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -62,7 +67,6 @@ class StudentController extends Controller
         ]);
 
         $date = strtotime(request('date'));
-
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
 
         $student = Student::create([
@@ -73,39 +77,11 @@ class StudentController extends Controller
             'last_name' => request('lastName'),
             'started_on' => $finalDate,
             'graduated' => false,
-
         ]);
 
         $cohorts = request('cohorts');
-
         $stu = Student::find($student->id);
-
         $stu->cohort()->associate($cohorts);
-
-        //ik moet eerst alle module ID's krijgen in de cohort_module
-        //dan kan ik met die modules een array in de student_modules voeren
-
-        //is hier niks wat laravel voor mij doet?
-
-
-
-        //Cohort::where('active', request('cohorts'))
-        //('active', 1)
-        //foreach ($cohort as request('cohorts')) {
-        //    # code...
-        //}
-        /*
-        $studentModules = StudentModule::create([
-            'student_id' => request('studentNumber'),
-            'module_id' => request('cohorts'),
-            'first_name' => request('firstName'),
-            'prefix' => request('prefix'),
-            'last_name' => request('lastName'),
-            'started_on' => $finalDate,
-            'graduated' => false,
-
-        ]);
-        */
 
         return;
     }
@@ -116,9 +92,9 @@ class StudentController extends Controller
      * @param  \App\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function show(Student $student)
+    public function show(Student $student, $id)
     {
-        //
+        return view('student');
     }
 
     /**

@@ -11,4 +11,5 @@
     </div>
 @endsection
 @section('content')
+<student></student>
 @endsection
