@@ -1,7 +1,7 @@
 <template>
 <div class="container">
 <span v-html="errorModal"></span>
-<div class="row" v-for="module in moduleList[0].modules" :key="module.id" v-if="moduleList[0]">
+<div v-if="moduleList[0]" v-for="module in moduleList[0].modules" :key="module.id" class="row">
   <div class="col-8">
     <div class="card bg-light mb-3">
       <div class="card-header">{{module.name}}</div>
@@ -33,7 +33,8 @@
   <div class="col-2">
     <div class="card text-center">
       <div class="card-body">
-        <input type="checkbox" id="checkbox" :value="module.id" v-model="module.student_modules[0].began" v-on:click="beganModule(module.id, !module.student_modules[0].began)">
+        <input v-if="module.student_modules[0]" v-model="module.student_modules[0].began" v-on:click="beganModule(module.id, !module.student_modules[0].began)" type="checkbox" id="checkbox" :value="module.id">
+        <input v-else v-on:click="beganModule(module.id, true)" type="checkbox" id="checkbox" :value="module.id">
         <label for="checkbox">Begonnen?</label>
       </div>
     </div>
@@ -50,7 +51,9 @@ export default {
   data: function() {
     return {
       moduleList: [],
-      errorModal: null
+      errorModal: null,
+      checked: false,
+      options: { disableEditing: true, toolbar: false }
     };
   },
   components: {

@@ -6,6 +6,7 @@ use App\StudentModules;
 use App\Student;
 use App\Cohort;
 use App\Module;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,25 +17,27 @@ class StudentModulesController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('teacher', ['only' => ['mark', 'getstudent']]);
     }
 
     public function toggle(Request $request, $id)
     {
         $student = Student::where('student_id', Auth::user()->getID())->pluck('id')->first();
-
+        $user = User::where('id', Auth::user()->getID())->pluck('id')->first();
         $exists = StudentModules::where('student_id', $student)->where('module_id', $id)->first();
+
         $array = [
             'student_id' => $student,
             'module_id' => $id,
             'begin_date' => Carbon::now()->toDateString(),
-            'finish_date' => Carbon::now()->addWeeks(2)->toDateString(),
-            'approved_by' => 1,
+            'finish_date' => null,
+            'approved_by' => $user,
         ];
 
-        if ($exists === null) {
+        if (!$exists) {
             $exists = StudentModules::create($array);
-        } else {
-            if (request('toggle') == true) {
+        } elseif (!$exists['approved_by']) {
+            if (request('began') == true) {
                 $exists->update(['begin_date' => Carbon::now()->toDateString() ]);
             } else {
                 $exists->update(['begin_date' => null ]);
@@ -42,6 +45,20 @@ class StudentModulesController extends Controller
         }
 
         return;
+    }
+
+    public function mark(Request $request, $id)
+    {
+        $user = User::where('id', Auth::user()->getID())->pluck('id')->first();
+        $studentModule = StudentModules::find($id);
+
+        if (request('passed')) {
+            $studentModule->mark = request('mark');
+            $studentModule->finish_date = Carbon::now()->toDateString();
+        }
+        
+        $studentModule->approved_by = $user;
+        $studentModule->save();
     }
 
     /**
@@ -52,7 +69,6 @@ class StudentModulesController extends Controller
     public function index()
     {
         $cohort = Student::where('student_id', Auth::user()->getID())->pluck('cohort_id')->first();
-
         $modules = Cohort::where('id', $cohort)->with('modules.studentModules')->get();
 
         return $modules;
@@ -60,11 +76,13 @@ class StudentModulesController extends Controller
 
     public function getstudent($id)
     {
-        $cohort = Student::find($id)->pluck('cohort_id');
+          $student = Student::with([
+            'cohort', 'cohort.modules' , 'cohort.modules.studentModules' => function ($query) use ($id) {
+                    $query->where('student_id', $id);
+            } , 'cohort.modules.studentModules.user:name'
+            ])->findOrFail($id);
 
-        $modules = Cohort::where('id', $cohort)->with('modules.studentModules')->get();
-
-        return $modules;
+        return $student;
     }
 
     /**

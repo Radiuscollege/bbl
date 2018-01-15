@@ -21,7 +21,12 @@
   "dependencies": {
     "@fortawesome/fontawesome": "^1.0.1",
     "@fortawesome/vue-fontawesome": "0.0.21",
+    "chart.js": "^2.7.1",
+    "popper.js": "^1.12.9",
+    "vue-chartjs": "^3.1.0",
+    "vue-multiselect": "^2.0.8",
     "vue2-medium-editor": "^1.1.2",
-    "vuejs-datepicker": "^0.9.21"
+    "vuejs-datepicker": "^0.9.21",
+    "webpack": "^3.10.0"
   }
 }

@@ -25,4 +25,14 @@ class StudentModules extends Model
     {
         return $this->belongsTo('App\Student');
     }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User', 'approved_by');
+    }
+
+    public function module()
+    {
+        return $this->belongsTo('App\Module');
+    }
 }
