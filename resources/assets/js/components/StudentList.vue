@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-<div class="list-group mb-3 text-center col-sm" v-for="student in students" :key="student.id" v-if="student">
+<div class="list-group mt-3 text-center col-sm" v-for="student in students" :key="student.id" v-if="student">
       <a v-bind:href="'/student/' + student.id" class="list-group-item list-group-item-action">
         {{student.student_id}} - {{student.first_name}} {{student.prefix}} {{student.last_name}} - 
         {{student.cohort.name}}

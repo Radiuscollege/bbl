@@ -156,4 +156,66 @@ class StudentModulesController extends Controller
 
         return $exists;
     }
+    //get student with all the related existing studentmodules
+    public function getstudent($id)
+    {
+        $student = Student::with([
+            'cohort.modules.studentModules' => function ($query) use ($id) {
+                $query->where('student_id', $id);
+            } , 'cohort.modules.studentModules.user:name'
+        ])->findOrFail($id);
+
+        return $student;
+    }
+
+    //Gets all the modules with mark and names of a student that this current student has too
+    public function getaveragemark(Request $request, $id)
+    {
+        $nameArray = array();
+        $studentArray = array();
+        $averageMarkArray = array();
+        $markArray = array();
+
+        //get all modules what is marked
+        $student = Student::with([
+            'cohort.modules.studentModules' => function ($query) use ($id) {
+                $query->whereNotNull('mark')->where('student_id', $id);
+            }
+        ])->findOrFail($id);
+        
+        $studentModules = $student->cohort->modules;
+
+        $otherStudents = Student::with([
+            //'cohort.modules' => function ($query) use ($studentModules) {
+            //    foreach ($studentModules as $module) {
+            //        $query->where('id', $module->id);
+            //    }
+            //},
+            'cohort.modules.studentModules' => function ($query) use ($id) {
+                $query->whereNotNull('mark')->where('student_id', '!=', $id);
+            }
+        ])->findOrFail($id);
+
+        $otherStudentModules = $otherStudents->cohort->modules;
+
+        foreach ($otherStudentModules as $osm) {
+            $avg = array();
+            foreach ($osm->studentModules as $studentModule) {
+                if ($studentModule->mark) {
+                    array_push($avg, $studentModule->mark);
+                }
+            }
+            array_push($studentArray, $osm->name);
+            array_push($averageMarkArray, array_sum($avg)/count($avg), 0.0);
+        }
+
+        foreach ($studentModules as $sm) {
+            if ($sm->studentModules->first()) {
+                array_push($nameArray, $sm->name);
+                array_push($markArray, $sm->studentModules->first()->mark, 0.0);
+            }
+        }
+
+        return [ "studentlabels" => $studentArray, "labels" => $nameArray, "marks" => $markArray, "averageMarks" => $averageMarkArray ];
+    }
 }

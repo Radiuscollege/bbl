@@ -1,24 +1,24 @@
 <template>
 <div class="container">
-  <div class="text-center mb-5">
+  <div class="text-center mb-5 d-print-none">
     <a v-on:click="showModules = true" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Modules</a>
     <a v-on:click="showModules = false" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Statistieken</a>
   </div>
-  <div>
+  <div v-if="showModules">
     <markmodal v-if="modalVisible" v-on:close="closeModal" :studentModule="modalData"></markmodal>
-    <div v-if="moduleList.cohort" v-for="module in moduleList.cohort.modules" :key="module.id" class="row card-columns border border-primary rounded">
-      <div class="col-4">
+    <div v-if="moduleList.cohort" v-for="module in moduleList.cohort.modules" :key="module.id" class="row pt-3 pb-3" style="border-bottom: 1px solid #ccc;">
+      <div class="col-2">
         <div class="card bg-light mb-3">
-          <div class="card-header">{{module.name}}</div>
-            <div class="card-body">
-              <p class="card-text">{{module.sub_description}}</p>
+          <div class="card-header text-center p-2">{{module.name}}</div>
+            <div class="card-body p-2">
+              <p class="card-text text-center">{{module.sub_description}}</p>
             </div>
           <div class="card-footer bg-transparent border-success">
             <a data-toggle="collapse" :href='"#collapse" + module.id'  aria-expanded="true" :aria-controls='"collapse" + module.id'>
               Uitleg
             </a>
             <div :id="'collapse' + module.id" class="collapse" role="tabpanel" aria-labelledby="heading" data-parent="#accordion">
-              <div class="card-body">
+              <div class="card-body p-0">
                 <medium-editor :text='module.long_description' :options='options'>
                 </medium-editor>
               </div>
@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="col-2">
-        <div class="card text-center h-25">
+        <div class="card text-center">
           <div class="card-body">
             <p class="card-text">{{module.week_duration / 8}} periode</p>
             <p class="card-text">=</p>
@@ -36,30 +36,48 @@
         </div>
       </div>
       <div class="col-2">
-        <div class="card text-center h-25">
+        <div class="card text-center">
           <div v-if="module.student_modules[0]" class="card-body">
-            <p class="card-text">Begin datum</p>
-            <p class="card-text">{{module.student_modules[0].begin_date}}</p>
+            <p class="card-text">Begindatum</p>
+            <p v-if="module.student_modules[0].begin_date" class="card-text">{{module.student_modules[0].begin_date}}</p>
+            <p v-else class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
+          </div>
+          <div v-else class="card-body">
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
           </div>
         </div>
       </div>
       <div class="col-2">
-        <div class="card text-center h-25">
+        <div class="card text-center">
           <div v-if="module.student_modules[0]" class="card-body">
             <p class="card-text">{{module.student_modules[0].finish_date}}</p>
-            <p class="card-text">Geschatte einddatum</p>
+            <p v-if="module.student_modules[0].finish_date" class="card-text">Geschatte einddatum</p>
+            <div v-else class="card-text">
+              <p>&nbsp;</p>
+              <p>&nbsp;</p>
+            </div>
             <p class="card-text">{{module.student_modules[0].expected_date}}</p>
+          </div>
+          <div v-else class="card-body">
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
           </div>
         </div>
       </div>
       <div class="col-2">
-        <div class="card text-center h-25">
+        <div class="card text-center">
           <div v-if="!module.student_modules[0] || module.student_modules[0].pass == false && module.student_modules[0].mark === null" class="card-body">
+            <p class="card-text">&nbsp;</p>
             <button type="button" class="btn btn-primary" v-on:click="openModal(module)">
               Accorderen
             </button>
+            <p class="card-text">&nbsp;</p>
           </div>
-          <div v-else-if="module.student_modules[0]" class="card-body">
+          <div v-else-if="module.student_modules[0]" class="card-body pt-2">
             <p>
               ✓
             </p>
@@ -76,23 +94,29 @@
         </div>
       </div>
       <div class="col-2">
-        <div v-if="module.student_modules[0]" class="card text-center h-25">
+        <div v-if="module.student_modules[0]" class="card text-center">
           <div v-if="!module.student_modules[0].pass" class="card-body">
+            <p class="card-text">&nbsp;</p>
             <input v-model="module.student_modules[0].began" v-on:click="beganModule(module.id, !module.student_modules[0].began)" type="checkbox" id="checkbox" :value="module.id">
             <label for="checkbox">Gestart?</label>
+            <p class="card-text">&nbsp;</p>
           </div>
-          <div v-else-if="module.student_modules[0].note" class="card-body">
-            <p class="card-text">{{module.student_modules[0].note}}</p>
+          <div v-else-if="module.student_modules[0].note" class="card-body p-3">
+            <textarea v-model="module.student_modules[0].note" class="form-control" rows="4" id="comment" disabled></textarea>
           </div>
         </div>
-        <div v-else class="card text-center h-25">
+        <div v-else class="card text-center">
           <div class="card-body">
             <input v-on:click="beganModule(module.id, true)" type="checkbox" id="checkbox" :value="module.id">
             <label for="checkbox">Gestart?</label>
+            <p class="card-text">&nbsp;</p>
           </div>
-        </div>
+        </div>   
       </div>
     </div>
+  </div>
+  <div v-else>
+    <studentchart :studentModule="moduleList"></studentchart>
   </div>
 </div>
 </template>
@@ -100,6 +124,7 @@
 import editor from "vue2-medium-editor";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import markmodal from "./MarkModal";
+import studentchart from "./StudentChart";
 
 export default {
   name: "student",

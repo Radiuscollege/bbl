@@ -23,7 +23,7 @@
 
 <body>
 	<div id="app" class="container">
-		<div class="row">
+		<div class="row d-print-none">
 			@yield('menu') @auth @if (Route::has('login'))
 			<div class="col-6 col-md-4">
 				<a class="float-right" href="{{ url('/amoclient/logout') }}">Log uit</a>
