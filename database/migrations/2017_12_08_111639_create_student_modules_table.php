@@ -19,11 +19,12 @@ class CreateStudentModulesTable extends Migration
             $table->foreign('student_id')->references('id')->on('students');
             $table->integer('module_id')->unsigned();
             $table->foreign('module_id')->references('id')->on('modules');
-            $table->integer('mark')->nullable();
+            $table->float('mark')->nullable();
             $table->string('approved_by')->nullable();
             $table->foreign('approved_by')->references('id')->on('users');
             $table->date('begin_date')->nullable();
             $table->date('finish_date')->nullable();
+            $table->string('note')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

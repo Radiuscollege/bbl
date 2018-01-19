@@ -34,7 +34,7 @@
     </medium-editor>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button class="btn btn-primary" v-on:click="saveModule">Opslaan</button>
+        <button v-on:click="saveModule" :disabled="submitted" class="btn btn-primary">Opslaan</button>
       </div>
     </div>
   </form>
@@ -52,7 +52,9 @@ export default {
       selectedObjects: [],
       selectedIds: [],
       module: [],
-      text: ""
+      text: "",
+      options: { placeholder: { text: "Voeg hier een beschrijving toe" }},
+      submitted: false
     };
   },
   watch: {
@@ -90,24 +92,10 @@ export default {
           for (var i = 0, len = this.module.cohorts.length; i < len; i++) {
             this.selectedObjects.push({id: this.module.cohorts[i].pivot.cohort_id, name: this.module.cohorts[i].name})
           }
-          //this.selectedObjects = this.module.cohorts.name;
-          //this.cohorts.id = this.module.cohorts[0].pivot.cohort_id
-          //this.cohorts.name = this.module.cohorts[0].name
-          /*this.selectedObjects = [
-            {
-              id: this.module.cohorts[0].pivot.cohort_id,
-              name: this.module.cohorts[0].name
-            },
-            {
-              id: this.module.cohorts[1].pivot.cohort_id,
-              name: this.module.cohorts[1].name
-            }
-          ];*/
-          //this.selectedIds = this.module.cohorts[0].pivot.cohort_id
         });
     },
-    saveModule: function(e) {
-      e.preventDefault();
+    saveModule: function() {
+      this.submitted = true;
       axios
         .put("/api/module/" + _.last(window.location.pathname.split("/")), {
           name: this.module.name,

@@ -35,7 +35,9 @@ Route::get('/api/studentmodule/{id}', 'StudentModulesController@getstudent');
 
 Route::post('/api/studentmodule/toggle/{id}', 'StudentModulesController@toggle');
 
-Route::post('/api/studentmodule/mark/{id}', 'StudentModulesController@mark');
+Route::put('/api/studentmodule/mark/{id}', 'StudentModulesController@mark');
+
+Route::get('/api/studentmodule/average/{id}', 'StudentModulesController@getaveragemark');
 
 Route::get('/statistics', function () {
     return view('statistics');

@@ -53,7 +53,7 @@ export default {
       moduleList: [],
       errorModal: null,
       checked: false,
-      options: { disableEditing: true, toolbar: false }
+      options: { disableEditing: true, toolbar: false, placeholder: false }
     };
   },
   components: {

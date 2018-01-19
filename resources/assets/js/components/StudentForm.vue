@@ -42,7 +42,7 @@
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button class="btn btn-primary" v-on:click="saveStudent">Opslaan</button>
+        <button v-on:click="saveStudent" :disabled="submitted" class="btn btn-primary">Opslaan</button>
       </div>
     </div>
   </form>
@@ -65,7 +65,8 @@ export default {
       date: null,
       selectedObjects: [],
       selectedIds: [],
-      format: "yyyy-MM-dd"
+      format: "yyyy-MM-dd",
+      submitted: false
     };
   },
   watch: {
@@ -88,8 +89,8 @@ export default {
         this.cohorts = res.data;
       });
     },
-    saveStudent: function(e) {
-      e.preventDefault();
+    saveStudent: function() {
+      this.submitted = true;
       axios
         .post("/api/student", {
           studentNumber: this.studentNumber,

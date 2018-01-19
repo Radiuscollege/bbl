@@ -21,6 +21,6 @@ class Module extends Model
     
     public function studentModules()
     {
-        return $this->hasMany('App\StudentModules')->where('student_id', 11);
+        return $this->hasMany('App\StudentModules');
     }
 }

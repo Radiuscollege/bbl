@@ -17,48 +17,7 @@ class StudentModulesController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('teacher', ['only' => ['mark', 'getstudent']]);
-    }
-
-    public function toggle(Request $request, $id)
-    {
-        $student = Student::where('student_id', Auth::user()->getID())->pluck('id')->first();
-        $user = User::where('id', Auth::user()->getID())->pluck('id')->first();
-        $exists = StudentModules::where('student_id', $student)->where('module_id', $id)->first();
-
-        $array = [
-            'student_id' => $student,
-            'module_id' => $id,
-            'begin_date' => Carbon::now()->toDateString(),
-            'finish_date' => null,
-            'approved_by' => $user,
-        ];
-
-        if (!$exists) {
-            $exists = StudentModules::create($array);
-        } elseif (!$exists['approved_by']) {
-            if (request('began') == true) {
-                $exists->update(['begin_date' => Carbon::now()->toDateString() ]);
-            } else {
-                $exists->update(['begin_date' => null ]);
-            }
-        }
-
-        return;
-    }
-
-    public function mark(Request $request, $id)
-    {
-        $user = User::where('id', Auth::user()->getID())->pluck('id')->first();
-        $studentModule = StudentModules::find($id);
-
-        if (request('passed')) {
-            $studentModule->mark = request('mark');
-            $studentModule->finish_date = Carbon::now()->toDateString();
-        }
-        
-        $studentModule->approved_by = $user;
-        $studentModule->save();
+        $this->middleware('teacher', ['only' => ['mark', 'getstudent', 'getaveragemark']]);
     }
 
     /**
@@ -72,17 +31,6 @@ class StudentModulesController extends Controller
         $modules = Cohort::where('id', $cohort)->with('modules.studentModules')->get();
 
         return $modules;
-    }
-
-    public function getstudent($id)
-    {
-          $student = Student::with([
-            'cohort', 'cohort.modules' , 'cohort.modules.studentModules' => function ($query) use ($id) {
-                    $query->where('student_id', $id);
-            } , 'cohort.modules.studentModules.user:name'
-            ])->findOrFail($id);
-
-        return $student;
     }
 
     /**
@@ -149,5 +97,63 @@ class StudentModulesController extends Controller
     public function destroy(StudentModules $studentModules)
     {
         //
+    }
+
+    public function toggle(Request $request, $id)
+    {
+        if (request('student') && Auth::user()->isTeacher()) {
+            $student = request('student');
+        } else {
+            $student = Student::where('student_id', Auth::user()->getID())->pluck('id')->first();
+        }
+
+        $exists = StudentModules::where('student_id', $student)->where('module_id', $id)->first();
+
+        $array = [
+            'student_id' => $student,
+            'module_id' => $id,
+            'begin_date' => Carbon::now()->toDateString()
+        ];
+
+        if (!$exists) {
+            $exists = StudentModules::create($array);
+        } elseif (!$exists['approved_by']) {
+            if (request('began') == true) {
+                $exists->update(['begin_date' => Carbon::now()->toDateString() ]);
+            } else {
+                $exists->update(['begin_date' => null ]);
+            }
+        }
+
+        return;
+    }
+
+    public function mark(Request $request, $id)
+    {
+        $user = User::where('id', Auth::user()->getID())->pluck('id')->first();
+
+        $exists = StudentModules::where('student_id', request('student'))->where('module_id', $id)->first();
+
+        $beginDate = new Carbon(request('beginDate'));
+
+        $finishDate = new Carbon(request('finishDate'));
+        
+        $array = [
+            'student_id' => request('student'),
+            'module_id' => $id,
+            'mark' => request('mark'),
+            'approved_by' => $user,
+            'begin_date' => $beginDate->toDateString(),
+            'finish_date' => $finishDate->toDateString(),
+            'note' => request('note')
+        ];
+
+        if (!$exists) {
+            $exists = StudentModules::create($array);
+        } else {
+            $exists->update($array);
+        }
+
+        return $exists;
     }
 }

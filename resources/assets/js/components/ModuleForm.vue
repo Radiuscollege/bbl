@@ -34,7 +34,7 @@
     </medium-editor>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button class="btn btn-primary" v-on:click="saveModule">Opslaan</button>
+        <button v-on:click="saveModule" :disabled="submitted" class="btn btn-primary" >Opslaan</button>
       </div>
     </div>
   </form>
@@ -54,7 +54,9 @@ export default {
       weekDuration: null,
       text: "",
       selectedObjects: [],
-      selectedIds: []
+      selectedIds: [],
+      options: { placeholder: { text: "Voeg hier een beschrijving toe" }},
+      submitted: false
     };
   },
   watch: {
@@ -79,8 +81,8 @@ export default {
         this.cohorts = res.data;
       });
     },
-    saveModule: function(e) {
-      e.preventDefault();
+    saveModule: function() {
+      this.submitted = true;
       axios
         .post("/api/module", {
           name: this.name,

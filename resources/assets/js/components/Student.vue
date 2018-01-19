@@ -1,7 +1,12 @@
 <template>
-  <div class="container">
-    <markmodal v-if="modalVisible" v-on:close="modalVisible = false" :studentModule="modalData"></markmodal>
-    <div v-if="moduleList.cohort" v-for="module in moduleList.cohort.modules" :key="module.id" class="row">
+<div class="container">
+  <div class="text-center mb-5">
+    <a v-on:click="showModules = true" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Modules</a>
+    <a v-on:click="showModules = false" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Statistieken</a>
+  </div>
+  <div>
+    <markmodal v-if="modalVisible" v-on:close="closeModal" :studentModule="modalData"></markmodal>
+    <div v-if="moduleList.cohort" v-for="module in moduleList.cohort.modules" :key="module.id" class="row card-columns border border-primary rounded">
       <div class="col-4">
         <div class="card bg-light mb-3">
           <div class="card-header">{{module.name}}</div>
@@ -22,7 +27,7 @@
         </div>
       </div>
       <div class="col-2">
-        <div class="card text-center">
+        <div class="card text-center h-25">
           <div class="card-body">
             <p class="card-text">{{module.week_duration / 8}} periode</p>
             <p class="card-text">=</p>
@@ -30,45 +35,66 @@
           </div>
         </div>
       </div>
-      <div v-if="!module.student_modules.mark || !module.student_modules.user" class="col-2">
-        <div class="card text-center">
-          <div class="card-body">
-          <button type="button" class="btn btn-primary" v-on:click="openModal(module.student_modules); console.log(module.student_modules[0]);">
-            Accorderen
-          </button>
-          </div>
-        </div>
-      </div>
-      <div v-else class="col-2">
-        <div class="card text-center">
-          <div class="card-body">
-            <div class="card-body">
-              <p v-if="module.student_modules.mark" class="card-text">
-                {{module.student_modules.mark}}
-                ✓
-              </p>
-              <p v-else class="card-text">
-                {{module.student_modules.user}}
-              </p>
-              <p>
-                ✓
-              </p>
-            </div>
+      <div class="col-2">
+        <div class="card text-center h-25">
+          <div v-if="module.student_modules[0]" class="card-body">
+            <p class="card-text">Begin datum</p>
+            <p class="card-text">{{module.student_modules[0].begin_date}}</p>
           </div>
         </div>
       </div>
       <div class="col-2">
-        <div class="card text-center">
-          <div class="card-body">
-            <input v-if="module.student_modules.began" v-model="module.student_modules.began" :value="module.id" type="checkbox" id="checkbox">
-            <input v-else type="checkbox" id="checkbox" :value="module.id">
-            <label for="checkbox">Begonnen?</label>
+        <div class="card text-center h-25">
+          <div v-if="module.student_modules[0]" class="card-body">
+            <p class="card-text">{{module.student_modules[0].finish_date}}</p>
+            <p class="card-text">Geschatte einddatum</p>
+            <p class="card-text">{{module.student_modules[0].expected_date}}</p>
           </div>
-          <p class="card-text"> </p>
+        </div>
+      </div>
+      <div class="col-2">
+        <div class="card text-center h-25">
+          <div v-if="!module.student_modules[0] || module.student_modules[0].pass == false && module.student_modules[0].mark === null" class="card-body">
+            <button type="button" class="btn btn-primary" v-on:click="openModal(module)">
+              Accorderen
+            </button>
+          </div>
+          <div v-else-if="module.student_modules[0]" class="card-body">
+            <p>
+              ✓
+            </p>
+            <p v-if="module.student_modules[0].mark">
+              {{module.student_modules[0].mark}}
+            </p>
+            <p v-else-if="module.student_modules[0].pass">
+              {{module.student_modules[0].approved_by}}
+            </p>
+            <button type="button" class="btn btn-primary" v-on:click="openModal(module)">
+              Accorderen
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-2">
+        <div v-if="module.student_modules[0]" class="card text-center h-25">
+          <div v-if="!module.student_modules[0].pass" class="card-body">
+            <input v-model="module.student_modules[0].began" v-on:click="beganModule(module.id, !module.student_modules[0].began)" type="checkbox" id="checkbox" :value="module.id">
+            <label for="checkbox">Gestart?</label>
+          </div>
+          <div v-else-if="module.student_modules[0].note" class="card-body">
+            <p class="card-text">{{module.student_modules[0].note}}</p>
+          </div>
+        </div>
+        <div v-else class="card text-center h-25">
+          <div class="card-body">
+            <input v-on:click="beganModule(module.id, true)" type="checkbox" id="checkbox" :value="module.id">
+            <label for="checkbox">Gestart?</label>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </template>
 <script>
 import editor from "vue2-medium-editor";
@@ -80,9 +106,7 @@ export default {
   data: function() {
     return {
       moduleList: [],
-      studentInfo: [],
-      pass: false,
-      options: { disableEditing: true, toolbar: false },
+      options: { disableEditing: true, toolbar: false, placeholder: false },
       modalVisible: false,
       modalData: null,
       showModules: true
@@ -94,20 +118,9 @@ export default {
     markmodal
   },
   created: function() {
-    this.getStudent();
     this.getModules();
   },
   methods: {
-    getStudent: function() {
-      axios
-        .get("/api/student/" + _.last(window.location.pathname.split("/")))
-        .then(res => {
-          this.studentInfo = res.data;
-        })
-        .catch(error => {
-          console.log("Er is iets foutgegaan tijdens het ophalen van de data.");
-        });
-    },
     getModules: function() {
       axios
         .get(
@@ -120,43 +133,54 @@ export default {
           console.log("Er is iets foutgegaan tijdens het ophalen van de data.");
         });
     },
-    setMark: function(moduleID, mark, passed) {
-      axios
-        .post("/api/studentmodule/mark/" + moduleID, {
-          mark: mark,
-          pass: passed
-        })
-        .then(res => {})
-        .catch(err => console.error(err));
-      this.pass = false;
-    },
     showPopup: function() {
       this.show = true;
     },
-    checkMark: function(array, id) {
-      try {
-        return array.find(o => o.module_id === id).mark !== null;
-      } catch (e) {
-        return false;
+    //Open the modal, tries to give existing data, otherwise gives default data with the current date.
+    openModal: function(module) {
+      if (module.student_modules[0]) {
+        this.modalData = {
+          id: module.id,
+          mark: module.student_modules[0].mark,
+          pass: null,
+          beginDate: module.student_modules[0].begin_date,
+          finishDate: module.student_modules[0].finish_date,
+          note: module.student_modules[0].note
+        };
+        if (module.student_modules[0].mark == null && module.student_modules[0].pass == true){
+          this.modalData.pass = true;
+        }
+        else {
+          this.modalData.pass = false;
+        }
+        if (!module.student_modules[0].begin_date){
+          this.modalData.beginDate = new Date();
+        }
+        if (!module.student_modules[0].finish_date){
+          this.modalData.finishDate = new Date();
+        }
+      } else {
+        this.modalData = {
+          id: module.id,
+          mark: null,
+          pass: false,
+          beginDate: new Date(),
+          finishDate: new Date()
+        };
       }
-    },
-    checkApprovedBy: function(array, id) {
-      try {
-        return array.find(o => o.module_id === id).approved_by !== null;
-      } catch (e) {
-        return false;
-      }
-    },
-    getValue: function(array, id) {
-      try {
-        return array.find(o => o.module_id === id);
-      } catch (e) {
-        return false;
-      }
-    },
-    openModal: function(data) {
-      this.modalData = data;
       this.modalVisible = true;
+    },
+    beganModule: function(moduleID, toggle) {
+      axios
+        .post("/api/studentmodule/toggle/" + moduleID, {
+          student: _.last(window.location.pathname.split("/")),
+          began: toggle
+        })
+        .then(res => {});
+    },
+    closeModal: function() {
+      this.getModules();
+      this.modalVisible = false;
     }
   }
 };
