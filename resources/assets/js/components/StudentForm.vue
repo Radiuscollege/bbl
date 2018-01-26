@@ -1,34 +1,42 @@
 <template>
-  <form class="form-horizontal was-validated">
+  <form v-on:submit.prevent class="form-horizontal">
+    <div v-if="error" class="alert alert-danger">
+        {{error}}
+    </div>
     <div class="form-group row">
       <label for="inputNumber" class="col-sm-2 col-form-label">OV-Nummer</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="studentNumber" type="text" placeholder="OV-Nummer" required>
+        <input v-validate="'required'" :class="{'input': true, 'form-control': true, 'invalid': errors.has('studentNumber') }" v-model="student.student_id" name="studentNumber" type="text" placeholder="OV-Nummer">
       </div>
     </div>
     <div class="form-group row">
       <label for="inputFirstName" class="col-sm-2 col-form-label">Voornaam</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="firstName" type="text" placeholder="Voornaam" required>
+        <input v-validate="'required'" :class="{'input': true, 'form-control': true, 'invalid': errors.has('firstName') }" v-model="student.first_name" class="form-control" name="firstName"  type="text" placeholder="Voornaam">
       </div>
     </div>
     <div class="form-group row">
       <label for="inputPrefix" class="col-sm-2 col-form-label">Tussenvoegsel</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="prefix" type="text" placeholder="Tussenvoegsel">
+        <input v-model="student.prefix" class="form-control" type="text" placeholder="Tussenvoegsel">
       </div>
     </div>
     <div class="form-group row">
       <label for="inputLastName" class="col-sm-2 col-form-label">Achternaam</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="lastName" type="text" placeholder="Achternaam" required>
+        <input v-validate="'required'" :class="{'input': true, 'form-control': true, 'invalid': errors.has('lastName') }" v-model="student.last_name" class="form-control" name="lastName" type="text" placeholder="Achternaam">
       </div>
     </div>
     <div class="form-group row">
       <label for="cohort" class="col-sm-2 col-form-label">Cohort</label>
       <div class="col-sm-5">
         <multiselect v-model="selectedObjects"
+          :class="{ 'is-danger': errors.has('cohort') }"
           :options="cohorts"
+          :disabled="studentInfo !== undefined"
+          v-validate="'required'"
+          placeholder="Kies cohort"
+          name="cohort"
           label="name" 
           track-by="id">
         </multiselect>
@@ -37,12 +45,12 @@
     <div class="form-group row">
       <label for="cohort" class="col-sm-2 col-form-label">Startdatum studie</label>
       <div class="col-sm-5">
-        <datepicker v-model="date" :format="format"></datepicker>
+        <datepicker v-validate="'required'" :input-class="{'invalid': errors.has('date') }" v-model="student.started_on" :format="format" name="date"></datepicker>
       </div>
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button v-on:click="saveStudent" :disabled="submitted" class="btn btn-primary">Opslaan</button>
+        <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary">Opslaan</button>
       </div>
     </div>
   </form>
@@ -52,21 +60,28 @@ import editor from "vue2-medium-editor";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Multiselect from "vue-multiselect";
 import Datepicker from "vuejs-datepicker";
+import VeeValidate from 'vee-validate';
+
+Vue.use(VeeValidate);
 
 export default {
   name: "studentform",
   data: function() {
     return {
-      cohorts: [{ id: "", name: "" }],
-      studentNumber: "",
-      firstName: "",
-      prefix: "",
-      lastName: "",
-      date: null,
+      student: {
+        cohorts: [{ id: "", name: "" }],
+        student_id: "",
+        firstName: "",
+        prefix: "",
+        lastName: "",
+        date: null,
+      },
       selectedObjects: [],
       selectedIds: [],
+      cohorts: [{ id: "", name: "" }],
       format: "yyyy-MM-dd",
-      submitted: false
+      submitted: false,
+      error: ""
     };
   },
   watch: {
@@ -80,8 +95,13 @@ export default {
     Multiselect,
     Datepicker
   },
+  props: ["studentInfo"],
   created: function() {
     this.getCohorts();
+    if (this.studentInfo) {
+      this.student = this.studentInfo;
+      this.selectedObjects = {id: this.student.cohort_id, name: this.student.cohort_name};
+    }
   },
   methods: {
     getCohorts: function() {
@@ -91,20 +111,60 @@ export default {
     },
     saveStudent: function() {
       this.submitted = true;
+      if (this.studentInfo !== undefined){
       axios
-        .post("/api/student", {
-          studentNumber: this.studentNumber,
+        .put("/api/student/" + _.last(window.location.pathname.split("/")), {
+          studentNumber: this.student.student_id,
           cohorts: this.selectedIds,
-          firstName: this.firstName,
-          prefix: this.prefix,
-          lastName: this.lastName,
-          date: this.date
+          firstName: this.student.first_name,
+          prefix: this.student.prefix,
+          lastName: this.student.last_name,
+          date: this.student.started_on
         })
         .then(res => {
-          document.location.href = 'student';
+          this.submitted = false;
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          this.submitted = false;
+          this.error = err.response.data.errors;
+        })
+      }
+      else {
+      axios
+        .post("/api/student", {
+          studentNumber: this.student.student_id,
+          cohorts: this.selectedIds,
+          firstName: this.student.first_name,
+          prefix: this.student.prefix,
+          lastName: this.student.last_name,
+          date: this.student.started_on
+        })
+        .then(res => {
+          document.location.href = '../student';
+        })
+        .catch(err => {
+          this.submitted = false;
+          this.error = err.response.data.errors.studentNumber[0];
+        })
+      }
+    },
+    validateForm: function() {
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          this.saveStudent();
+          return;
+        }
+        this.error = "Je bent vergeten om iets in te vullen."
+      });
     }
   }
 };
 </script>
+<style>
+.is-danger .multiselect__tags {
+  border-color: red;
+}
+.invalid {
+  border-color: red!important;
+}
+</style>

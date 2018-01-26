@@ -99,6 +99,7 @@ class StudentModulesController extends Controller
         //
     }
 
+    //Check if its student or teacher (to prevent students from toggling other students modules)
     public function toggle(Request $request, $id)
     {
         if (request('student') && Auth::user()->isTeacher()) {
@@ -201,7 +202,7 @@ class StudentModulesController extends Controller
         foreach ($otherStudentModules as $osm) {
             $avg = array();
             foreach ($osm->studentModules as $studentModule) {
-                if ($studentModule->mark) {
+                if ($studentModule->mark && $studentModule->mark != "0") {
                     array_push($avg, $studentModule->mark);
                 }
             }

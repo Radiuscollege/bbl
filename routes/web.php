@@ -11,29 +11,35 @@
 |
 */
 
-Route::get('/', 'UserController@index')->name('home');
+Route::get('/', 'UserController@index');
 
 Route::get('/amoclient/ready', function () {
     return view('login');
 })->name('login');
 
-Route::get('/student', 'StudentController@index')->name('studentlist');
+Route::get('/student', 'StudentController@index');
 
-Route::get('/addstudent', 'StudentController@add')->name('addstudent');
-
-Route::post('/api/student', 'StudentController@store')->name('addstudent');
-
-Route::get('/api/student', 'StudentController@showall')->name('getstudents');
+Route::get('/student/add', 'StudentController@add');
 
 Route::get('/student/{id}', 'StudentController@show');
 
+Route::get('/student/search/{value}', 'StudentController@studentsearch');
+
+Route::post('/api/student', 'StudentController@store');
+
+Route::put('/api/student/{id}', 'StudentController@update');
+
+Route::get('/api/student', 'StudentController@showall');
+
 Route::get('/api/student/{id}', 'StudentController@loadstudent');
+
+Route::get('/api/student/search/{value}', 'StudentController@studentsearchresult');
 
 Route::get('/api/studentmodule', 'StudentModulesController@index');
 
 Route::get('/api/studentmodule/{id}', 'StudentModulesController@getstudent');
 
-Route::post('/api/studentmodule/toggle/{id}', 'StudentModulesController@toggle');
+Route::put('/api/studentmodule/toggle/{id}', 'StudentModulesController@toggle');
 
 Route::put('/api/studentmodule/mark/{id}', 'StudentModulesController@mark');
 
@@ -41,22 +47,22 @@ Route::get('/api/studentmodule/average/{id}', 'StudentModulesController@getavera
 
 Route::get('/statistics', function () {
     return view('statistics');
-})->name('statistics');
+});
 
-Route::get('/module', 'ModuleController@index')->name('modulelist');
+Route::get('/module', 'ModuleController@index');
 
-Route::get('/api/module', 'ModuleController@showall')->name('getmodules');
+Route::get('/api/module', 'ModuleController@showall');
 
-Route::get('/module/{id}', 'ModuleController@show')->name('editmodule');
+Route::get('/module/{id}', 'ModuleController@show');
 
-Route::get('/addmodule', 'ModuleController@add')->name('moduleform');
+Route::get('/module/add', 'ModuleController@add');
 
-Route::post('/api/module', 'ModuleController@store')->name('addmodule');
+Route::post('/api/module', 'ModuleController@store');
 
-Route::get('/api/module/{id}', 'ModuleController@loadmodule')->name('showmodule');
+Route::get('/api/module/{id}', 'ModuleController@loadmodule');
 
-Route::put('/api/module/{id}', 'ModuleController@editmodule')->name('editmodule');
+Route::put('/api/module/{id}', 'ModuleController@editmodule');
 
-Route::post('/api/cohort', 'CohortController@store')->name('addcohort');
+Route::post('/api/cohort', 'CohortController@store');
 
-Route::get('/api/cohort', 'CohortController@index')->name('cohort');
+Route::get('/api/cohort', 'CohortController@index');

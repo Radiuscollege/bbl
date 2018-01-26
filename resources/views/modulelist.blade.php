@@ -11,7 +11,7 @@
 </div>
 @endsection @section('content')
 <cohort></cohort>
-<a class="btn btn-primary" href="{{ url('/addmodule') }}">
+<a class="btn btn-primary mb-3 mt-3" href="{{ url('/module/add') }}">
 	<span>Module toevoegen</span>
 </a>
 <modulelist></modulelist>

@@ -14,6 +14,18 @@ class Student extends Model
     protected $hidden = [
         'deleted_at', 'created_at', 'updated_at'
     ];
+
+    protected $appends = ['progress', 'cohort_name'];
+
+    public function getProgressAttribute()
+    {
+        return ($this->studentmodules->where('approved_by', '!=', null)->count() / $this->cohort->modules->count()) * 100;
+    }
+
+    public function getCohortNameAttribute()
+    {
+        return $this->cohort->name;
+    }
     
     public function studentmodules()
     {

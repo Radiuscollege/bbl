@@ -9,6 +9,7 @@
     </div>
 @endsection 
 @section('content')
+<studentsearch></studentsearch>
 <div class="row links-container justify-content-center h-50">
 	<a class="btn btn-outline-primary my-auto" href="{{ url('/module') }}">
 		<span>Modules</span>

@@ -30,6 +30,12 @@ class ModuleController extends Controller
 
     public function editmodule(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'name' => 'required|unique:modules|max:40',
+            'subDescription' => 'max:80',
+            'weekDuration' => 'required|numeric'
+        ]);
+
         $module = Module::findOrFail($id);
         $module->name = request('name');
         $module->sub_description = request('subDescription');
@@ -71,7 +77,7 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|max:40',
+            'name' => 'required|unique:modules|max:40',
             'subDescription' => 'max:80',
             'weekDuration' => 'required|numeric'
         ]);

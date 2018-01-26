@@ -13,5 +13,5 @@
 	</nav>
 </div>
 @endsection @section('content')
-<editmoduleform></editmoduleform>
+<moduleform></moduleform>
 @endsection

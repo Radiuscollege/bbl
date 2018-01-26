@@ -29,6 +29,37 @@ class StudentController extends Controller
         return Student::find($id);
     }
 
+    public function studentsearch()
+    {
+        return view('studentsearch');
+    }
+
+    //splits the search term and returns near identical students
+    public function studentsearchresult(Request $request, $value)
+    {
+        $words = explode(' ', $value);
+        /*
+        return Student::with(['cohort' => function ($query) use ($words) {
+            foreach ($words as $word) {
+                $query->orWhere('name', 'LIKE', '%' . $word . '%');
+            }
+        }])->where(function ($query) use ($words) {
+        */
+        return Student::with('cohort')->where(function ($query) use ($words) {
+            foreach ($words as $word) {
+                $query->orWhere('student_id', 'LIKE', '%' . $word . '%');
+            }
+        })->orWhere(function ($query) use ($words) {
+            foreach ($words as $word) {
+                $query->orWhere('first_name', 'LIKE', '%' . $word . '%');
+            }
+        })->orWhere(function ($query) use ($words) {
+            foreach ($words as $word) {
+                $query->orWhere('last_name', 'LIKE', '%' . $word . '%');
+            }
+        })->get();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +89,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'studentNumber' => 'required|max:20',
+            'studentNumber' => 'required|unique:students,student_id|max:20',
             'cohorts' => 'required',
             'firstName' => 'required|max:40',
             'prefix' => 'max:40',
@@ -92,7 +123,7 @@ class StudentController extends Controller
      * @param  \App\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function show(Student $student, $id)
+    public function show(Student $student)
     {
         return view('student');
     }
@@ -115,9 +146,28 @@ class StudentController extends Controller
      * @param  \App\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Student $student)
+    public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'firstName' => 'required|max:40',
+            'prefix' => 'max:40',
+            'lastName' => 'required|max:40',
+            'date' => 'required|date',
+        ]);
+
+        $date = strtotime(request('date'));
+        $finalDate = Carbon::createFromTimestamp($date)->toDateString();
+
+        $student = Student::findOrFail($id);
+
+        $student->update([
+            'first_name' => request('firstName'),
+            'prefix' => request('prefix'),
+            'last_name' => request('lastName'),
+            'started_on' => $finalDate,
+        ]);
+
+        return $student;
     }
 
     /**

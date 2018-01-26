@@ -33,7 +33,7 @@
   <div class="col-2">
     <div class="card text-center">
       <div class="card-body">
-        <input v-if="module.student_modules[0]" v-model="module.student_modules[0].began" v-on:click="beganModule(module.id, !module.student_modules[0].began)" type="checkbox" id="checkbox" :value="module.id">
+        <input v-if="module.student_modules[0]" v-model="module.student_modules[0].begin_date" v-on:click="beganModule(module.id, !module.student_modules[0].begin_date)" type="checkbox" id="checkbox" :value="module.id">
         <input v-else v-on:click="beganModule(module.id, true)" type="checkbox" id="checkbox" :value="module.id">
         <label for="checkbox">Begonnen?</label>
       </div>
@@ -87,7 +87,7 @@ export default {
     },
     beganModule: function(moduleID, toggle) {
       axios
-        .post("/api/studentmodule/toggle/" + moduleID, { began: toggle })
+        .put("/api/studentmodule/toggle/" + moduleID, { began: toggle })
         .then(res => {});
     }
   }

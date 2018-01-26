@@ -17,15 +17,15 @@ window.Vue = require('vue');
 
 Vue.component('cohort', require('./components/Cohort.vue'));
 Vue.component('markmodal', require('./components/MarkModal.vue'));
-Vue.component('module', require('./components/Module.vue'));
 Vue.component('moduleform', require('./components/ModuleForm.vue'));
-Vue.component('editmoduleform', require('./components/EditModuleForm.vue'));
 Vue.component('modulelist', require('./components/ModuleList.vue'));
 Vue.component('student', require('./components/Student.vue'));
 Vue.component('studentchart', require('./components/StudentChart.vue'));
 Vue.component('studentform', require('./components/StudentForm.vue'));
 Vue.component('studentlist', require('./components/StudentList.vue'));
 Vue.component('studentprogress', require('./components/StudentProgress.vue'));
+Vue.component('studentsearch', require('./components/StudentSearch.vue'));
+Vue.component('studentsearchresult', require('./components/StudentSearchResult.vue'));
 
 const app = new Vue({
     el: '#app'

@@ -15,16 +15,32 @@ class StudentModules extends Model
         'deleted_at', 'created_at', 'updated_at'
     ];
 
-    protected $appends = ['began', 'pass'];
+    protected $appends = ['began', 'expected_date', 'pass', 'teacher'];
 
     public function getBeganAttribute()
     {
         return $this->attributes['begin_date'] != null;
     }
 
+    //check if the begin date exists, it added an expected date (from Now) without it
+    public function getExpectedDateAttribute()
+    {
+        if ($this->attributes['begin_date'] != null) {
+            $date = new Carbon($this->attributes['begin_date']);
+            return $date->addWeeks($this->module->week_duration)->toDateString();
+        } else {
+            return;
+        }
+    }
+
     public function getPassAttribute()
     {
         return $this->attributes['approved_by'] != null;
+    }
+
+    public function getTeacherAttribute()
+    {
+        return $this->user['name'];
     }
 
     public function student()

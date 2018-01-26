@@ -1,12 +1,13 @@
 <template>
 <div class="container">
+  <studentform :studentInfo="studentInfo"></studentform>
   <div class="text-center mb-5 d-print-none">
     <a v-on:click="showModules = true" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Modules</a>
     <a v-on:click="showModules = false" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Statistieken</a>
   </div>
   <div v-if="showModules">
     <markmodal v-if="modalVisible" v-on:close="closeModal" :studentModule="modalData"></markmodal>
-    <div v-if="moduleList.cohort" v-for="module in moduleList.cohort.modules" :key="module.id" class="row pt-3 pb-3" style="border-bottom: 1px solid #ccc;">
+    <div v-if="studentInfo.cohort" v-for="module in studentInfo.cohort.modules" :key="module.id" class="row pt-3 pb-3" style="border-bottom: 1px solid #ccc;">
       <div class="col-2">
         <div class="card bg-light mb-3">
           <div class="card-header text-center p-2">{{module.name}}</div>
@@ -37,10 +38,9 @@
       </div>
       <div class="col-2">
         <div class="card text-center">
-          <div v-if="module.student_modules[0]" class="card-body">
+          <div v-if="module.student_modules[0] && module.student_modules[0].begin_date" class="card-body">
             <p class="card-text">Begindatum</p>
-            <p v-if="module.student_modules[0].begin_date" class="card-text">{{module.student_modules[0].begin_date}}</p>
-            <p v-else class="card-text">&nbsp;</p>
+            <p class="card-text">{{module.student_modules[0].begin_date}}</p>
             <p class="card-text">&nbsp;</p>
           </div>
           <div v-else class="card-body">
@@ -54,12 +54,13 @@
         <div class="card text-center">
           <div v-if="module.student_modules[0]" class="card-body">
             <p class="card-text">{{module.student_modules[0].finish_date}}</p>
-            <p v-if="module.student_modules[0].finish_date" class="card-text">Geschatte einddatum</p>
+            <p v-if="module.student_modules[0].begin_date" class="card-text">Geschatte einddatum: 
+              {{module.student_modules[0].expected_date}}
+            </p>
             <div v-else class="card-text">
               <p>&nbsp;</p>
               <p>&nbsp;</p>
             </div>
-            <p class="card-text">{{module.student_modules[0].expected_date}}</p>
           </div>
           <div v-else class="card-body">
             <p class="card-text">&nbsp;</p>
@@ -78,8 +79,8 @@
             <p class="card-text">&nbsp;</p>
           </div>
           <div v-else-if="module.student_modules[0]" class="card-body pt-2">
-            <p>
-              ✓
+            <p v-if="module.student_modules[0].begin_date">
+              ✓ {{module.student_modules[0].teacher}}
             </p>
             <p v-if="module.student_modules[0].mark">
               {{module.student_modules[0].mark}}
@@ -97,16 +98,23 @@
         <div v-if="module.student_modules[0]" class="card text-center">
           <div v-if="!module.student_modules[0].pass" class="card-body">
             <p class="card-text">&nbsp;</p>
-            <input v-model="module.student_modules[0].began" v-on:click="beganModule(module.id, !module.student_modules[0].began)" type="checkbox" id="checkbox" :value="module.id">
+            <input v-model="module.student_modules[0].begin_date" v-on:click="beganModule(module.id, !module.student_modules[0].begin_date)" type="checkbox" id="checkbox" :value="module.id">
             <label for="checkbox">Gestart?</label>
             <p class="card-text">&nbsp;</p>
           </div>
           <div v-else-if="module.student_modules[0].note" class="card-body p-3">
             <textarea v-model="module.student_modules[0].note" class="form-control" rows="4" id="comment" disabled></textarea>
           </div>
+          <div v-else>
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
+            <p class="card-text">&nbsp;</p>
+          </div>
         </div>
         <div v-else class="card text-center">
           <div class="card-body">
+            <p class="card-text">&nbsp;</p>
             <input v-on:click="beganModule(module.id, true)" type="checkbox" id="checkbox" :value="module.id">
             <label for="checkbox">Gestart?</label>
             <p class="card-text">&nbsp;</p>
@@ -116,7 +124,7 @@
     </div>
   </div>
   <div v-else>
-    <studentchart :studentModule="moduleList"></studentchart>
+    <studentchart :studentModule="studentInfo"></studentchart>
   </div>
 </div>
 </template>
@@ -130,7 +138,7 @@ export default {
   name: "student",
   data: function() {
     return {
-      moduleList: [],
+      studentInfo: [],
       options: { disableEditing: true, toolbar: false, placeholder: false },
       modalVisible: false,
       modalData: null,
@@ -152,7 +160,7 @@ export default {
           "/api/studentmodule/" + _.last(window.location.pathname.split("/"))
         )
         .then(res => {
-          this.moduleList = res.data;
+          this.studentInfo = res.data;
         })
         .catch(error => {
           console.log("Er is iets foutgegaan tijdens het ophalen van de data.");
@@ -197,11 +205,11 @@ export default {
     },
     beganModule: function(moduleID, toggle) {
       axios
-        .post("/api/studentmodule/toggle/" + moduleID, {
+        .put("/api/studentmodule/toggle/" + moduleID, {
           student: _.last(window.location.pathname.split("/")),
           began: toggle
         })
-        .then(res => {});
+        .then(res => this.getModules());
     },
     closeModal: function() {
       this.getModules();

@@ -41,7 +41,7 @@ class CohortController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|max:40',
+            'name' => 'required|unique:cohorts|max:40',
         ]);
                 
         return Cohort::create([ 'name' => request('name') ]);
