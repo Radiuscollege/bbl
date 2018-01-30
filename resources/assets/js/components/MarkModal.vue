@@ -19,7 +19,7 @@
                       <input v-model="module[0].mark" type="number" class="form-control" placeholder="0.0" step="0.1" min="0" max="10">
                     </div>
                     <label for="or" class="col-sm-2 col-form-label">of</label>
-                    <div class="col">
+                    <div class="col my-auto">
                       <div class="form-check">
                         <input v-model="module[0].pass" class="form-check-input" type="checkbox" id="gridCheck">
                         <label class="form-check-label" for="gridCheck">

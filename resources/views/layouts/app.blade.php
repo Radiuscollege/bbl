@@ -23,15 +23,18 @@
 
 <body>
 	<div id="app" class="container">
-		<div class="row d-print-none">
-			@yield('menu') @auth @if (Route::has('login'))
-			<div class="col-6 col-md-4">
-				<a class="float-right" href="{{ url('/amoclient/logout') }}">Log uit</a>
-				@else
-				<a class="float-right" href="{{ url('/amoclient/redirect') }}">Log in</a>
-				@endauth
-			</div>
-			@endif
+		<div class="d-print-none">
+			<nav aria-label="breadcrumb" class="breadcrumb d-flex justify-content-between">
+				@yield('menu') 
+				<span class="navbar-text p-0">
+				@auth @if (Route::has('login'))
+					<a class="float-right" href="{{ url('/amoclient/logout') }}">Log uit</a>
+					@else
+					<a class="float-right" href="{{ url('/amoclient/redirect') }}">Log in</a>
+					@endauth
+				@endif
+    			</span>
+			</nav>
 		</div>
 		@yield('content')
 	</div>

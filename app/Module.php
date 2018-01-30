@@ -14,6 +14,13 @@ class Module extends Model
         'created_at', 'updated_at'
     ];
 
+    protected $appends = ['used'];
+
+    public function getUsedAttribute()
+    {
+        return $this->studentModules()->exists();
+    }
+
     public function cohorts()
     {
         return $this->belongsToMany('App\Cohort');

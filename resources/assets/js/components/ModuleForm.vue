@@ -91,7 +91,7 @@ export default {
       });
     },
     getModule: function() {
-      if (_.last(window.location.pathname.split("/"))){
+      if (Number.isInteger(parseInt(_.last(window.location.pathname.split("/"))))){
       axios
         .get("/api/module/" + _.last(window.location.pathname.split("/")))
         .then(res => {
@@ -108,7 +108,7 @@ export default {
     },
     saveModule: function() {
       this.submitted = true;
-      if (_.last(window.location.pathname.split("/"))){
+      if (_.isInteger(parseInt(_.last(window.location.pathname.split("/"))))){
       axios
         .put("/api/module/" + _.last(window.location.pathname.split("/")), {
           name: this.module.name,
@@ -134,7 +134,7 @@ export default {
           longDescription: this.text
         })
         .then(res => {
-          document.location.href = 'module';
+          document.location.href = '../module';
         })
         .catch(err => {
           this.submitted = false;

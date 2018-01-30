@@ -11,8 +11,9 @@
           <a data-toggle="collapse" :href='"#collapse" + module.id'  aria-expanded="true" :aria-controls='"collapse" + module.id'>
             Uitleg
           </a>
-          <a class="btn btn-primary float-right" :href="'/module/' + module.id" role="button">Wijzigen</a>
-          <button v-on:click="editModule" class="btn btn-danger float-right">Verwijderen</button>
+          <div class="float-right"><a v-bind:href="'/module/' + module.id" role="button" class="btn btn-primary">Wijzigen</a>
+          <button v-if="!module.used" v-on:click="deleteModule(module.id)" role="button" class="btn btn-danger">Verwijderen</button>
+          </div>
           <div :id="'collapse' + module.id" class="collapse" role="tabpanel" aria-labelledby="heading" data-parent="#accordion">
             <div class="card-body">
               <medium-editor :text='module.long_description' :options='options'>
@@ -45,10 +46,7 @@ export default {
   data: function() {
     return {
       modules: [],
-      options: {
-        disableEditing: true,
-        toolbar: false
-      }
+      options: { disableEditing: true, toolbar: false, placeholder: false }
     };
   },
   components: {
@@ -62,6 +60,11 @@ export default {
     getModules: function() {
       axios.get("/api/module").then(res => {
         this.modules = res.data;
+      });
+    },
+    deleteModule: function(id) {
+      axios.delete("/api/module/" + id).then(res => {
+        this.getModules();
       });
     }
   }

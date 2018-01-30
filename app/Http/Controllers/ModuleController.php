@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Module;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ModuleController extends Controller
 {
@@ -31,7 +32,7 @@ class ModuleController extends Controller
     public function editmodule(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'name' => 'required|unique:modules|max:40',
+            'name' => ['required', 'max:40', Rule::unique('modules')->ignore($id)],
             'subDescription' => 'max:80',
             'weekDuration' => 'required|numeric'
         ]);
@@ -135,8 +136,10 @@ class ModuleController extends Controller
      * @param  \App\Module  $module
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Module $module)
+    public function destroy(Module $module, $id)
     {
-        //
+        $module = Module::find($id);
+
+        $module->delete();
     }
 }

@@ -1,6 +1,7 @@
 <template>
 <div class="container">
   <studentform :studentInfo="studentInfo"></studentform>
+  <hr>
   <div class="text-center mb-5 d-print-none">
     <a v-on:click="showModules = true" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Modules</a>
     <a v-on:click="showModules = false" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Statistieken</a>
@@ -73,7 +74,7 @@
         <div class="card text-center">
           <div v-if="!module.student_modules[0] || module.student_modules[0].pass == false && module.student_modules[0].mark === null" class="card-body">
             <p class="card-text">&nbsp;</p>
-            <button type="button" class="btn btn-primary" v-on:click="openModal(module)">
+            <button type="button" class="btn btn-primary d-print-none" v-on:click="openModal(module)">
               Accorderen
             </button>
             <p class="card-text">&nbsp;</p>
@@ -88,7 +89,7 @@
             <p v-else-if="module.student_modules[0].pass">
               {{module.student_modules[0].approved_by}}
             </p>
-            <button type="button" class="btn btn-primary" v-on:click="openModal(module)">
+            <button type="button" class="btn btn-primary d-print-none" v-on:click="openModal(module)">
               Accorderen
             </button>
           </div>

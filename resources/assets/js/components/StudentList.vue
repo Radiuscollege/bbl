@@ -1,12 +1,7 @@
 <template>
 <div class="container">
-  <div class="col-lg-3 float-right">
-	  <div class="input-group">
-	  	<input v-model="search" type="text" class="form-control" placeholder="Zoek voor student...">
-	  	<span class="input-group-btn"></span>
-	  </div>
-  </div>
-  <div class="card" style="width: 18rem;">
+  <div class="row align-items-start">
+  <div class="card">
     <div class="card-body">
       <h5 class="card-title">Filter</h5>
       <div class="form-check">
@@ -21,7 +16,7 @@
           Achternaam
         </label>
       </div>
-          <div class="form-check">
+      <div class="form-check">
         <input class="form-check-input" type="radio" id="ovnumber" value="OVNumber" v-model="criteria">
         <label class="form-check-label">
           OV-nummer
@@ -40,22 +35,23 @@
         </label>
       </div>
       <br>
-      <div class="btn-group btn-group-toggle" data-toggle="buttons">
         <label class="btn btn-secondary">
-          <input v-model="order" type="radio" name="options" id="ascend" value="asc" autocomplete="off"> Oplopend
+          <input v-model="order" type="radio" id="ascend" value="asc"> Oplopend
         </label>
         <label class="btn btn-secondary">
-          <input v-model="order" type="radio" name="options" id="descend" value="desc" autocomplete="off"> Aflopend
+          <input v-model="order" type="radio" nam id="descend" value="desc"> Aflopend
         </label>
-      </div>
     </div>
   </div>
-  <div class="list-group mt-3 text-center col-sm" v-for="student in sortedStudents" :key="student.id" v-if="student">
+  <div class="col-sm-6">
+  <div class="list-group mb-3 text-center" v-for="student in onSearch" :key="student.id" v-if="student">
         <a v-bind:href="'/student/' + student.id" class="list-group-item list-group-item-action">
           {{student.student_id}} - {{student.first_name}} {{student.prefix}} {{student.last_name}} - 
-          {{student.cohort.name}} - {{student.progress.toLocaleString()}}%
+          {{student.cohort.name}} - {{student.progress.toFixed(0)}}%
         </a>
   </div>
+  </div>
+</div>
 </div>
 </template>
 <script>
@@ -66,6 +62,7 @@ export default {
   data: function() {
     return {
       students: [],
+      sortedStudents: [],
       criteria: "",
       order: "asc",
       search: ""
@@ -81,36 +78,45 @@ export default {
     getStudents: function() {
       axios.get("/api/student").then(res => {
         this.students = res.data;
+        this.sortedStudents = this.students;
       });
-    }
+    },
   },
   computed: {
     //checks in which order it must be shown with criteria
     //then checks if the search term string is included in the list
-    sortedStudents: {
-      cache: false,
-      get: function() {
+    onSearch: function() {
+      console.log("onsearch");
       var vm = this;
       var obj = [];
-      if (vm.criteria === "") {
-        var list = _.orderBy(vm.students, "first_name");
+      if (this.criteria === "") {
+        /*
+        //var list = _.orderBy(this.sortedStudents, "first_name");
+        //using arrow function to be able to use this.
         
-        list.forEach(function(d) {
           //return Object.keys(d).map(e => d[e].toLowerCase().includes(vm.search.toLowerCase()));
           
-
+        this.sortedStudents = this.students;
+        Object.keys(d).forEach(key => {
           //wacht ik heb natuurlijk ook nog de cohort object, die kan neit toLowerCase
-          Object.keys(d).forEach(function (key){
             if (_.isString(d[key]))
             {
-              if (d[key].toLowerCase().includes(vm.search.toLowerCase()))
+              if (d[key].toLowerCase().includes(this.search.toLowerCase()))
               {
                 obj.push(d);
+                return;
               }
             }
-          });
           console.log(obj);
-          return obj;
+          this.sortedStudents = obj;
+          obj = [];
+          //moet het eigenlijk telkens sortedstudents weer opneiuw maken
+
+          //het lijkt net of die iets onthoudt
+
+          return this.sortedStudents;
+          */
+          return this.students;
           //filter is ook nog een soort van foreach, kijk of ik die kan verwijderen
           //het probleem is nu namelijk dat de laatste leeg is..., hij moet
           //de obj onthouden en niet opnieuw leeg maken 
@@ -131,30 +137,37 @@ export default {
           // return d["first_name"].toLowerCase().includes(vm.search.toLowerCase()); dit werkt wel maar de bovenste niet hmmmmmmmmmm. het is gewoon hetzlefde alleen geeft
           //die de value van bijvoorbeeld de ID direct xD het is of omdat het een integer is, of omdat die niet daadwerkelijk checked in de array maar puur de value
           //en een value heeft natuurlijk neit includes enz toch..... zou wel meoten xD
-        });
       }
        else if (vm.criteria === "Firstname") {
         return _.orderBy(
-          d["first_name"].toLowerCase().includes(vm.search.toLowerCase()),
+          this.students,
           "first_name",
           vm.order
         );
       } else if (vm.criteria === "Lastname") {
-        return _.orderBy(vm.students, ["last_name"], ["asc"]);
-      } else if (vm.criteria === "OVNummer") {
         return _.orderBy(
-          d["student_id"].toLowerCase().includes(vm.search.toLowerCase()),
+          this.students,
+          "last_name",
+          vm.order
+        );
+      } else if (vm.criteria === "OVNumber") {
+        return _.orderBy(
+          this.students,
           "student_id",
           vm.order
         );
       } else if (vm.criteria === "Cohort") {
         return _.orderBy(
-          d["cohort"].toLowerCase().includes(vm.search.toLowerCase()),
+          this.students,
           "cohort.name",
           vm.order
         );
-      } else if (vm.criteria === "Voortgang") {
-        return _.orderBy(d, "progress", order);
+      } else if (vm.criteria === "Progress") {
+        return _.orderBy(
+          this.students,
+          "progress",
+          vm.order
+        );
       }
       //kan bijna de if hetzelfde als de first name maken en dan gewoon een foreach doen,...
       //return _.orderBy(vm.students, 'first_name');
@@ -172,7 +185,6 @@ export default {
 
       //de orderby werkt gewoon niet xD hij gaat gewoon in de if..yyyy
       //ahhhhhhhhhhhhhhhhhhhhhhhhhh hij geeft de keys niet terug, alleen de valeus
-    }
     }
   }
 };

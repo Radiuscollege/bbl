@@ -48,9 +48,17 @@
         <datepicker v-validate="'required'" :input-class="{'invalid': errors.has('date') }" v-model="student.started_on" :format="format" name="date"></datepicker>
       </div>
     </div>
+    <div v-if="student.progress" class="form-group row">
+      <label for="inputPrefix" class="col-sm-2 col-form-label">Geslaagd</label>
+      <div class="col-sm-5">
+        <i v-if="student.progress == 100" class="fas fa-check-square my-auto mr-4"></i>
+        <i v-else class="fas fa-window-close my-auto mr-4"></i>
+        <button v-on:click="print" class="btn btn-primary d-print-none">Uitprinten</button>
+      </div>
+    </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary">Opslaan</button>
+        <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary d-print-none">Opslaan</button>
       </div>
     </div>
   </form>
@@ -156,6 +164,9 @@ export default {
         }
         this.error = "Je bent vergeten om iets in te vullen."
       });
+    },
+    print: function() {
+      window.print();
     }
   }
 };

@@ -45,23 +45,25 @@ Route::put('/api/studentmodule/mark/{id}', 'StudentModulesController@mark');
 
 Route::get('/api/studentmodule/average/{id}', 'StudentModulesController@getaveragemark');
 
-Route::get('/statistics', function () {
-    return view('statistics');
-});
+Route::get('/statistics', 'StatisticsController@index');
+
+Route::get('/api/statistics', 'StatisticsController@showstatistics');
 
 Route::get('/module', 'ModuleController@index');
 
 Route::get('/api/module', 'ModuleController@showall');
 
-Route::get('/module/{id}', 'ModuleController@show');
-
 Route::get('/module/add', 'ModuleController@add');
+
+Route::get('/module/{id}', 'ModuleController@show');
 
 Route::post('/api/module', 'ModuleController@store');
 
 Route::get('/api/module/{id}', 'ModuleController@loadmodule');
 
 Route::put('/api/module/{id}', 'ModuleController@editmodule');
+
+Route::delete('/api/module/{id}', 'ModuleController@destroy');
 
 Route::post('/api/cohort', 'CohortController@store');
 

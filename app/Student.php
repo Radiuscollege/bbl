@@ -8,7 +8,7 @@ class Student extends Model
 {
 
     protected $fillable = [
-        'student_id', 'cohort_id', 'first_name', 'prefix', 'last_name', 'graduated', 'started_on'
+        'student_id', 'cohort_id', 'first_name', 'prefix', 'last_name', 'started_on'
     ];
 
     protected $hidden = [

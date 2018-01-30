@@ -1,15 +1,14 @@
 <template>
-<div class="col-lg-3 float-right">
-	<div class="input-group">
+<div class="float-right">
+  <div class="input-group pt-3 pr-3">
 		<input v-model="search" type="text" class="form-control" placeholder="Zoek voor student...">
-		<span class="input-group-btn">
-      <button v-on:click="searchStudent" class="btn btn-default"><i class="fas fa-search"></i></button>
-		</span>
-	</div>
+    <div class="input-group-append">
+      <button v-on:click="searchStudent" class="btn btn-primary"><i class="fas fa-search"></i></button>
+    </div>
+  </div>
 </div>
 </template>
 <script>
-
 export default {
   name: "studentsearch",
   data: function() {
@@ -19,8 +18,8 @@ export default {
   },
   methods: {
     searchStudent: function() {
-      document.location.href = '/student/search' + this.search;
-    },
+      window.location.href = "../student/search/" + this.search;
+    }
   }
 };
 </script>

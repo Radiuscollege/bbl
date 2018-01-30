@@ -1,10 +1,9 @@
 <template>
     <div class="row justify-content-center">
         <select v-model="selected">
-            <option v-for="(cohort, index) in cohorts" v-bind:key="cohort.id">
+            <option v-for="cohort in cohorts" v-bind:key="cohort.id">
                 {{ cohort.name }}
             </option>
-            
         </select>
     <input v-model="cohort" placeholder="Cohort toevoegen">
     <button class="btn-primary" v-on:click="createCohort">Voeg een cohort toe</button>
@@ -29,12 +28,10 @@ export default {
       });
     },
     createCohort: function() {
-      axios.post(
-          "api/cohort",
-          {
-            name: this.cohort
-          }
-        )
+      axios
+        .post("api/cohort", {
+          name: this.cohort
+        })
         .then(res => {
           this.cohort = "";
           this.getCohorts();

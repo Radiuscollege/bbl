@@ -100,6 +100,7 @@ class StudentModulesController extends Controller
     }
 
     //Check if its student or teacher (to prevent students from toggling other students modules)
+    //then either add or remove the begin_date
     public function toggle(Request $request, $id)
     {
         if (request('student') && Auth::user()->isTeacher()) {
@@ -129,10 +130,9 @@ class StudentModulesController extends Controller
         return;
     }
 
+    //Adds or updates mark
     public function mark(Request $request, $id)
     {
-        $user = User::where('id', Auth::user()->getID())->pluck('id')->first();
-
         $exists = StudentModules::where('student_id', request('student'))->where('module_id', $id)->first();
 
         $beginDate = new Carbon(request('beginDate'));
@@ -143,7 +143,7 @@ class StudentModulesController extends Controller
             'student_id' => request('student'),
             'module_id' => $id,
             'mark' => request('mark'),
-            'approved_by' => $user,
+            'approved_by' => Auth::user()->getID(),
             'begin_date' => $beginDate->toDateString(),
             'finish_date' => $finishDate->toDateString(),
             'note' => request('note')
@@ -157,6 +157,7 @@ class StudentModulesController extends Controller
 
         return $exists;
     }
+
     //get student with all the related existing studentmodules
     public function getstudent($id)
     {
@@ -199,6 +200,7 @@ class StudentModulesController extends Controller
 
         $otherStudentModules = $otherStudents->cohort->modules;
 
+        //prepare the data for the Vue Chart (average, 0.0, etc)
         foreach ($otherStudentModules as $osm) {
             $avg = array();
             foreach ($osm->studentModules as $studentModule) {
