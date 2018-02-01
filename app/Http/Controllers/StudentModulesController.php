@@ -209,7 +209,11 @@ class StudentModulesController extends Controller
                 }
             }
             array_push($studentArray, $osm->name);
-            array_push($averageMarkArray, array_sum($avg)/count($avg), 0.0);
+            if ($avg == null) {
+                array_push($averageMarkArray, 0.0, 0.0);
+            } else {
+                array_push($averageMarkArray, array_sum($avg)/count($avg), 0.0);
+            }
         }
 
         foreach ($studentModules as $sm) {
@@ -219,6 +223,6 @@ class StudentModulesController extends Controller
             }
         }
 
-        return [ "studentlabels" => $studentArray, "labels" => $nameArray, "marks" => $markArray, "averageMarks" => $averageMarkArray ];
+        return [ "student_labels" => $studentArray, "labels" => $nameArray, "marks" => $markArray, "average_marks" => $averageMarkArray ];
     }
 }

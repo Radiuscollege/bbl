@@ -15,7 +15,7 @@ class StudentModules extends Model
         'deleted_at', 'created_at', 'updated_at'
     ];
 
-    protected $appends = ['began', 'expected_date', 'pass', 'teacher'];
+    protected $appends = ['began', 'expected_date', 'pass', 'teacher', 'date_difference'];
 
     public function getBeganAttribute()
     {
@@ -41,6 +41,13 @@ class StudentModules extends Model
     public function getTeacherAttribute()
     {
         return $this->user['name'];
+    }
+
+    public function getDateDifferenceAttribute()
+    {
+        $begin = new Carbon($this->attributes['begin_date']);
+        $end = new Carbon($this->attributes['finish_date']);
+        return $begin->diffInWeeks($end);
     }
 
     public function student()

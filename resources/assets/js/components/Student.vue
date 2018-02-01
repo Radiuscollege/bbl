@@ -9,8 +9,8 @@
   <div v-if="showModules">
     <markmodal v-if="modalVisible" v-on:close="closeModal" :studentModule="modalData"></markmodal>
     <div v-if="studentInfo.cohort" v-for="module in studentInfo.cohort.modules" :key="module.id" class="row pt-3 pb-3" style="border-bottom: 1px solid #ccc;">
-      <div class="col-2">
-        <div class="card bg-light mb-3">
+      <div class="col-2 my-auto">
+        <div class="card bg-light">
           <div class="card-header text-center p-2">{{module.name}}</div>
             <div class="card-body p-2">
               <p class="card-text text-center">{{module.sub_description}}</p>
@@ -28,7 +28,7 @@
           </div>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-2 my-auto">
         <div class="card text-center">
           <div class="card-body">
             <p class="card-text">{{module.week_duration / 8}} periode</p>
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-2 my-auto">
         <div class="card text-center">
           <div v-if="module.student_modules[0] && module.student_modules[0].begin_date" class="card-body">
             <p class="card-text">Begindatum</p>
@@ -51,7 +51,7 @@
           </div>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-2 my-auto">
         <div class="card text-center">
           <div v-if="module.student_modules[0]" class="card-body">
             <p class="card-text">{{module.student_modules[0].finish_date}}</p>
@@ -70,7 +70,7 @@
           </div>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-2 my-auto">
         <div class="card text-center">
           <div v-if="!module.student_modules[0] || module.student_modules[0].pass == false && module.student_modules[0].mark === null" class="card-body">
             <p class="card-text">&nbsp;</p>
@@ -95,7 +95,7 @@
           </div>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-2 my-auto">
         <div v-if="module.student_modules[0]" class="card text-center">
           <div v-if="!module.student_modules[0].pass" class="card-body">
             <p class="card-text">&nbsp;</p>

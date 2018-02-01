@@ -21,7 +21,7 @@ class ModuleController extends Controller
 
     public function showall()
     {
-        return Module::all();
+        return Module::with('cohorts')->get();
     }
 
     public function loadmodule($id)

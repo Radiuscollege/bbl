@@ -27,6 +27,7 @@
     "vee-validate": "^2.0.3",
     "vue-chartjs": "^3.1.0",
     "vue-multiselect": "^2.0.8",
+    "vue-popperjs": "^1.2.5",
     "vue2-medium-editor": "^1.1.2",
     "vuejs-datepicker": "^0.9.21",
     "webpack": "^3.10.0"

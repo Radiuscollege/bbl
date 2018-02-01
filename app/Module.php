@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Module extends Model
 {
@@ -14,11 +15,16 @@ class Module extends Model
         'created_at', 'updated_at'
     ];
 
-    protected $appends = ['used'];
+    protected $appends = ['used', 'avg_duration'];
 
     public function getUsedAttribute()
     {
         return $this->studentModules()->exists();
+    }
+
+    public function getAvgDurationAttribute()
+    {
+        return $this->studentModules()->get()->avg('date_difference');
     }
 
     public function cohorts()

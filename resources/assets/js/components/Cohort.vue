@@ -1,13 +1,15 @@
 <template>
-    <div class="row justify-content-center">
-        <select v-model="selected">
-            <option v-for="cohort in cohorts" v-bind:key="cohort.id">
-                {{ cohort.name }}
-            </option>
-        </select>
-    <input v-model="cohort" placeholder="Cohort toevoegen">
-    <button class="btn-primary" v-on:click="createCohort">Voeg een cohort toe</button>
-    </div>
+  <div class="row justify-content-center">
+    <select v-model="selected">
+      <option value="All">Alle cohorts tonen</option>
+      <option v-for="cohort in cohorts" v-bind:key="cohort.id">
+        {{ cohort.name }}
+      </option>
+    </select>
+    <input v-model="cohort" placeholder="Cohort toevoegen" type="text">
+    <button class="btn btn-primary" v-on:click="createCohort">Voeg een cohort toe</button>
+    <modulelist :cohort="selected"></modulelist>
+  </div>
 </template>
 <script>
 export default {
@@ -15,7 +17,8 @@ export default {
   data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
-      cohort: ""
+      cohort: "",
+      selected: "All"
     };
   },
   created: function() {

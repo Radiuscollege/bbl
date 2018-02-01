@@ -35,7 +35,7 @@ export default {
                 {
                   label: "Gemiddelde",
                   backgroundColor: "#005cbf",
-                  data: this.markAverage.averageMarks
+                  data: this.markAverage.average_marks
                 }
               ]
             }

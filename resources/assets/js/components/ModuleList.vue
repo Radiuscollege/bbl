@@ -1,8 +1,8 @@
 <template>
 <div class="container">
-  <div class="row" v-for="module in modules" :key="module.id" v-if="module">
+  <div class="row" v-for="module in filteredModules" :key="module.id" v-if="module">
     <div class="col-8">
-      <div class="card bg-light mb-3">
+      <div class="card bg-light mt-3">
         <div class="card-header">{{module.name}}</div>
         <div class="card-body">
           <p class="card-text">{{module.sub_description}}</p>
@@ -23,7 +23,7 @@
         </div>
       </div>
     </div>
-    <div class="col-2">
+    <div class="col-2 my-auto">
       <div class="card text-center">
         <div class="card-body">
           <p class="card-text">{{module.week_duration / 8}} periode</p>
@@ -49,6 +49,7 @@ export default {
       options: { disableEditing: true, toolbar: false, placeholder: false }
     };
   },
+  props: ["cohort"],
   components: {
     "medium-editor": editor,
     FontAwesomeIcon
@@ -66,6 +67,14 @@ export default {
       axios.delete("/api/module/" + id).then(res => {
         this.getModules();
       });
+    }
+  },
+  computed: {
+    filteredModules: function() {
+      if(this.cohort == "All"){
+        return this.modules;
+      }
+      return _.filter(this.modules, { cohorts: [ { name: this.cohort } ]});
     }
   }
 };

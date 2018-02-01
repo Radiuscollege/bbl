@@ -19,7 +19,7 @@ class Student extends Model
 
     public function getProgressAttribute()
     {
-        return ($this->studentmodules->where('approved_by', '!=', null)->count() / $this->cohort->modules->count()) * 100;
+        return ($this->studentModules->where('approved_by', '!=', null)->count() / $this->cohort->modules->count()) * 100;
     }
 
     public function getCohortNameAttribute()
@@ -27,7 +27,7 @@ class Student extends Model
         return $this->cohort->name;
     }
     
-    public function studentmodules()
+    public function studentModules()
     {
         return $this->hasMany('App\StudentModules');
     }

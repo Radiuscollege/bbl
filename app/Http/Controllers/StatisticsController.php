@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Module;
+use App\Student;
+use App\Cohort;
 
 class StatisticsController extends Controller
 {
@@ -26,14 +28,21 @@ class StatisticsController extends Controller
 
     public function showstatistics()
     {
-        $moduleInfo = Module::withCount(['studentModules',
+        $students = Student::where('graduated', false)->count();
+
+        $cohorts = Cohort::withCount(['students as student_cohort_count'])->with('students')->get();
+
+        $moduleInfo = Module::withCount(['studentModules as student_modules_count' => function ($query) {
+            $query->where('approved_by', null);
+        },
         'studentModules as finished_modules_count' => function ($query) {
             $query->where('approved_by', '!=', null);
-        }, 'studentModules as avg' => function ($query) {
+        }, 'studentModules as avg_mark' => function ($query) {
             $query->select(DB::raw('avg(mark) average'));
-        }
-        ])->get();
+        },
+        ])->with(['studentModules.student'])
+        ->get();
  
-        return $moduleInfo;
+        return [ "cohorts" => $cohorts, "student_amount" => $students, "module_info" => $moduleInfo ];
     }
 }
