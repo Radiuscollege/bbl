@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\File;
+use App\Module;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('teacher');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -33,9 +40,19 @@ class FileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
-        //
+        /*
+        $path = $request->file('attachment')->store('documents');
+
+        $array = [
+            'location' => $path,
+            'module_id' => $id
+        ];
+
+        $file = File::create($array);
+        return $file;
+        */
     }
 
     /**
@@ -78,7 +95,7 @@ class FileController extends Controller
      * @param  \App\File  $file
      * @return \Illuminate\Http\Response
      */
-    public function destroy(File $file)
+    public function destroy(Request $request, File $file)
     {
         //
     }

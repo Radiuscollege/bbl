@@ -16,11 +16,15 @@ window.Vue = require('vue');
  */
 
 Vue.component('cohort', require('./components/Cohort.vue'));
+Vue.component('cohortchart', require('./components/CohortChart.vue'));
 Vue.component('markmodal', require('./components/MarkModal.vue'));
 Vue.component('moduleform', require('./components/ModuleForm.vue'));
 Vue.component('modulelist', require('./components/ModuleList.vue'));
+Vue.component('fileupload', require('./components/FileUpload.vue'));
 Vue.component('statistics', require('./components/Statistics.vue'));
 Vue.component('student', require('./components/Student.vue'));
+Vue.component('studentaveragechart', require('./components/StudentAverageChart.vue'));
+Vue.component('studentamountchart', require('./components/StudentAmountChart.vue'));
 Vue.component('studentchart', require('./components/StudentChart.vue'));
 Vue.component('studentform', require('./components/StudentForm.vue'));
 Vue.component('studentlist', require('./components/StudentList.vue'));

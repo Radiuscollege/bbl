@@ -89,7 +89,7 @@ export default {
     setMark: function() {
       this.submitted = true;
       axios
-        .put("/api/studentmodule/mark/" + this.module[0].id, {
+        .put("/api/studentmodule/"  + this.module[0].id + "/mark", {
           student: _.last(window.location.pathname.split("/")),
           mark: this.module[0].mark,
           pass: this.module[0].pass,

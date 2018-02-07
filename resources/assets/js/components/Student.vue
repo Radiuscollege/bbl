@@ -1,5 +1,15 @@
 <template>
 <div class="container">
+  <div v-if="error" class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Waarschuwing</h5>
+      </div>
+      <div class="modal-body">
+        Deze student bestaat waarschijnlijk niet (meer).
+      </div>
+    </div>
+  </div>
   <studentform :studentInfo="studentInfo"></studentform>
   <hr>
   <div class="text-center mb-5 d-print-none">
@@ -8,8 +18,9 @@
   </div>
   <div v-if="showModules">
     <markmodal v-if="modalVisible" v-on:close="closeModal" :studentModule="modalData"></markmodal>
-    <div v-if="studentInfo.cohort" v-for="module in studentInfo.cohort.modules" :key="module.id" class="row pt-3 pb-3" style="border-bottom: 1px solid #ccc;">
+    <div v-if="studentInfo.cohort" v-for="(module, index) in studentInfo.cohort.modules" :key="module.id" class="row pt-3 pb-3" style="border-bottom: 1px solid #ccc;">
       <div class="col-2 my-auto">
+        <h4 v-if="index == 0" class="text-center">Naam</h4>
         <div class="card bg-light">
           <div class="card-header text-center p-2">{{module.name}}</div>
             <div class="card-body p-2">
@@ -29,6 +40,7 @@
         </div>
       </div>
       <div class="col-2 my-auto">
+        <h4 v-if="index == 0" class="text-center">Duur</h4>
         <div class="card text-center">
           <div class="card-body">
             <p class="card-text">{{module.week_duration / 8}} periode</p>
@@ -38,9 +50,10 @@
         </div>
       </div>
       <div class="col-2 my-auto">
+        <h4 v-if="index == 0" class="text-center">Begindatum</h4>
         <div class="card text-center">
           <div v-if="module.student_modules[0] && module.student_modules[0].begin_date" class="card-body">
-            <p class="card-text">Begindatum</p>
+            <p class="card-text">&nbsp;</p>
             <p class="card-text">{{module.student_modules[0].begin_date}}</p>
             <p class="card-text">&nbsp;</p>
           </div>
@@ -52,6 +65,7 @@
         </div>
       </div>
       <div class="col-2 my-auto">
+        <h4 v-if="index == 0" class="text-center">Einddatum</h4>
         <div class="card text-center">
           <div v-if="module.student_modules[0]" class="card-body">
             <p class="card-text">{{module.student_modules[0].finish_date}}</p>
@@ -71,6 +85,7 @@
         </div>
       </div>
       <div class="col-2 my-auto">
+        <h4 v-if="index == 0" class="text-center">Beoordeling</h4>
         <div class="card text-center">
           <div v-if="!module.student_modules[0] || module.student_modules[0].pass == false && module.student_modules[0].mark === null" class="card-body">
             <p class="card-text">&nbsp;</p>
@@ -80,13 +95,13 @@
             <p class="card-text">&nbsp;</p>
           </div>
           <div v-else-if="module.student_modules[0]" class="card-body pt-2">
-            <p v-if="module.student_modules[0].begin_date">
+            <p v-if="module.student_modules[0].teacher">
               ✓ {{module.student_modules[0].teacher}}
             </p>
             <p v-if="module.student_modules[0].mark">
               {{module.student_modules[0].mark}}
             </p>
-            <p v-else-if="module.student_modules[0].pass">
+            <p v-else-if="module.student_modules[0].approved_by">
               {{module.student_modules[0].approved_by}}
             </p>
             <button type="button" class="btn btn-primary d-print-none" v-on:click="openModal(module)">
@@ -143,7 +158,8 @@ export default {
       options: { disableEditing: true, toolbar: false, placeholder: false },
       modalVisible: false,
       modalData: null,
-      showModules: true
+      showModules: true,
+      error: false
     };
   },
   components: {
@@ -163,8 +179,8 @@ export default {
         .then(res => {
           this.studentInfo = res.data;
         })
-        .catch(error => {
-          console.log("Er is iets foutgegaan tijdens het ophalen van de data.");
+        .catch(err => {
+          this.error = true;
         });
     },
     showPopup: function() {
@@ -206,7 +222,7 @@ export default {
     },
     beganModule: function(moduleID, toggle) {
       axios
-        .put("/api/studentmodule/toggle/" + moduleID, {
+        .put("/api/studentmodule/"  + moduleID + "/toggle", {
           student: _.last(window.location.pathname.split("/")),
           began: toggle
         })

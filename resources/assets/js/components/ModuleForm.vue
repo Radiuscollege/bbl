@@ -15,7 +15,7 @@
         <input class="form-control" v-model="module.sub_description" type="text" placeholder="Sub beschrijving">
       </div>
     </div>
-      <div class="form-group row">
+    <div class="form-group row">
       <label for="inputPeriod" class="col-sm-2 col-form-label">Duur in weken</label>
       <div class="col-sm-5">
         <input v-validate="'required|numeric|max_value:100'" name="weekDuration" :class="{ 'input': true, 'form-control': true, 'invalid': errors.has('weekDuration') }" v-model="module.week_duration" type="number" placeholder="Duur in weken">
@@ -37,6 +37,7 @@
       </div>
     </div>
     <br>
+    <!--<fileupload :location="'/api/upload/' + module.id"></fileupload>-->
     <medium-editor :text='module.long_description' :options='options' v-on:edit='processEditOperation' custom-tag='div'>
     </medium-editor>
     <div class="form-group row">
@@ -50,7 +51,8 @@
 import editor from "vue2-medium-editor";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Multiselect from "vue-multiselect";
-import VeeValidate from 'vee-validate';
+import VeeValidate from "vee-validate";
+import fileupload from "./FileUpload";
 
 Vue.use(VeeValidate);
 
@@ -59,12 +61,18 @@ export default {
   data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
-      module: { name: "", sub_description: "", week_duration: null, long_description: ""},
+      module: {
+        name: "",
+        sub_description: "",
+        week_duration: null,
+        long_description: ""
+      },
       selectedObjects: [],
       selectedIds: [],
-      options: { placeholder: { text: "Voeg hier een beschrijving toe" }},
+      options: { placeholder: { text: "Voeg hier een beschrijving toe" } },
       submitted: false,
-      error: ""
+      error: "",
+      attachment: { name: null, file: null }
     };
   },
   watch: {
@@ -91,66 +99,85 @@ export default {
       });
     },
     getModule: function() {
-      if (Number.isInteger(parseInt(_.last(window.location.pathname.split("/"))))){
-      axios
-        .get("/api/module/" + _.last(window.location.pathname.split("/")))
-        .then(res => {
-          this.module = res.data;
-          this.selectedObjects = [];
-          //this.module.cohorts.forEach(function(element) {
-          //  this.selectedObjects.push({id: element.pivot.cohort_id, name: element.name})
-          //});
-          for (var i = 0, len = this.module.cohorts.length; i < len; i++) {
-            this.selectedObjects.push({id: this.module.cohorts[i].pivot.cohort_id, name: this.module.cohorts[i].name})
-          }
-        });
+      if (
+        Number.isInteger(parseInt(_.last(window.location.pathname.split("/"))))
+      ) {
+        axios
+          .get("/api/module/" + _.last(window.location.pathname.split("/")))
+          .then(res => {
+            this.module = res.data;
+            this.selectedObjects = [];
+            //this.module.cohorts.forEach(function(element) {
+            //  this.selectedObjects.push({id: element.pivot.cohort_id, name: element.name})
+            //});
+            for (var i = 0, len = this.module.cohorts.length; i < len; i++) {
+              this.selectedObjects.push({
+                id: this.module.cohorts[i].pivot.cohort_id,
+                name: this.module.cohorts[i].name
+              });
+            }
+          });
       }
     },
     saveModule: function() {
       this.submitted = true;
-      if (_.isInteger(parseInt(_.last(window.location.pathname.split("/"))))){
-      axios
-        .put("/api/module/" + _.last(window.location.pathname.split("/")), {
-          name: this.module.name,
-          subDescription: this.module.sub_description,
-          weekDuration: this.module.week_duration,
-          cohorts: this.selectedIds,
-          longDescription: this.text
-        })
-        .then(res => {
-          document.location.href = "../module";
-        })
-        .catch(err => {
-          this.submitted = false;
-          this.error = err.response.data.errors.name[0];
-        });
+      if (_.isInteger(parseInt(_.last(window.location.pathname.split("/"))))) {
+        axios
+          .put("/api/module/" + _.last(window.location.pathname.split("/")), {
+            name: this.module.name,
+            subDescription: this.module.sub_description,
+            weekDuration: this.module.week_duration,
+            cohorts: this.selectedIds,
+            longDescription: this.text
+          })
+          .then(res => {
+            document.location.href = "../module";
+          })
+          .catch(err => {
+            this.submitted = false;
+            this.error = err.response.data.errors.name[0];
+          });
       } else {
-      axios
-        .post("/api/module", {
-          name: this.module.name,
-          subDescription: this.module.sub_description,
-          weekDuration: this.module.week_duration,
-          cohorts: this.selectedIds,
-          longDescription: this.text
-        })
-        .then(res => {
-          document.location.href = '../module';
-        })
-        .catch(err => {
-          this.submitted = false;
-          console.log(err);
-          this.error = err.response.data.errors.name[0];
-        });
+        axios
+          .post("/api/module", {
+            name: this.module.name,
+            subDescription: this.module.sub_description,
+            weekDuration: this.module.week_duration,
+            cohorts: this.selectedIds,
+            longDescription: this.text
+          })
+          .then(res => {
+            document.location.href = "../module";
+          })
+          .catch(err => {
+            this.submitted = false;
+            console.log(err);
+            this.error = err.response.data.errors.name[0];
+          });
       }
     },
     validateForm: function() {
-      this.$validator.validateAll().then((result) => {
+      this.$validator.validateAll().then(result => {
         if (result) {
           this.saveModule();
           return;
         }
-        this.error = "Je bent vergeten om iets in te vullen."
+        this.error = "Je bent vergeten om iets in te vullen.";
       });
+    },
+    onFileChange(e) {
+      console.log("FILECHANGE");
+      this.attachment.file = e.target.files || e.dataTransfer.files;
+      this.attachment.name = e.target.name;
+
+      var data = new FormData();
+      data.append("attachment", this.attachment.file);
+      axios.post(
+        "/api/upload/" +
+          _.last(window.location.pathname.split("/"), data, {
+            headers: { "Content-Type": "multipart/form-data" }
+          })
+      );
     }
   }
 };
@@ -160,6 +187,6 @@ export default {
   border-color: red;
 }
 .invalid {
-  border-color: red!important;
+  border-color: red !important;
 }
 </style>

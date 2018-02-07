@@ -4,9 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StudentModules extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'student_id', 'module_id', 'mark', 'approved_by', 'begin_date', 'finish_date', 'note'
     ];
@@ -16,6 +19,8 @@ class StudentModules extends Model
     ];
 
     protected $appends = ['began', 'expected_date', 'pass', 'teacher', 'date_difference'];
+
+    protected $dates = ['deleted_at'];
 
     public function getBeganAttribute()
     {

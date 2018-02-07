@@ -9,7 +9,7 @@ export default {
       markAverage: []
     };
   },
-  props: ["studentModule"],
+  props: ["studentModule", "isStudent"],
   created: function() {
     this.getAverage();
   },
@@ -18,8 +18,9 @@ export default {
     getAverage: function() {
       axios
         .get(
-          "/api/studentmodule/average/" +
-            _.last(window.location.pathname.split("/"))
+          this.isStudent ? "/api/statistics/average" : "/api/statistics/" +
+            _.last(window.location.pathname.split("/")) +
+            "/average" 
         )
         .then(res => {
           this.markAverage = res.data;
@@ -28,7 +29,12 @@ export default {
               labels: this.markAverage.labels,
               datasets: [
                 {
-                  label: this.studentModule.first_name + (this.studentModule.prefix == null ? " " : " " + this.studentModule.prefix + " ")  + this.studentModule.last_name,
+                  label:
+                    this.studentModule.first_name +
+                    (this.studentModule.prefix == null
+                      ? " "
+                      : " " + this.studentModule.prefix + " ") +
+                    this.studentModule.last_name,
                   backgroundColor: "#f87979",
                   data: this.markAverage.marks
                 },
@@ -42,7 +48,19 @@ export default {
           };
           this.renderChart(this.datacollection.datacollection, {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: {
+              xAxes: [
+                {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                    min: 0,
+                    autoSkip: false
+                  }
+                }
+              ]
+            }
           });
         })
         .catch(error => {

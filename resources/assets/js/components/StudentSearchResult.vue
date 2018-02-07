@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     getStudents: function() {
-      axios.get("/api/student/search/" + _.last(window.location.pathname.split("/"))).then(res => {
+      axios.get("/api/student/" + _.last(window.location.pathname.split("/")) + "/search" ).then(res => {
         this.students = res.data;
       });
     },

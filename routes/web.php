@@ -23,35 +23,37 @@ Route::get('/student/add', 'StudentController@add');
 
 Route::get('/student/{id}', 'StudentController@show');
 
-Route::get('/student/search/{value}', 'StudentController@studentsearch');
+Route::get('/student/search/{value}', 'StudentController@studentSearch');
 
 Route::post('/api/student', 'StudentController@store');
 
 Route::put('/api/student/{id}', 'StudentController@update');
 
-Route::get('/api/student', 'StudentController@showall');
+Route::get('/api/student', 'StudentController@showAll');
 
-Route::get('/api/student/{id}', 'StudentController@loadstudent');
+Route::get('/api/student/{id}', 'StudentController@loadStudent');
 
-Route::get('/api/student/search/{value}', 'StudentController@studentsearchresult');
+Route::delete('/api/student/{id}', 'StudentController@destroy');
+
+Route::get('/api/student/{value}/search', 'StudentController@studentSearchResult');
 
 Route::get('/api/studentmodule', 'StudentModulesController@index');
 
-Route::get('/api/studentmodule/{id}', 'StudentModulesController@getstudent');
+Route::get('/api/studentmodule/{id}', 'StudentModulesController@getStudent');
 
-Route::put('/api/studentmodule/toggle/{id}', 'StudentModulesController@toggle');
+Route::put('/api/studentmodule/{id}/toggle', 'StudentModulesController@toggle');
 
-Route::put('/api/studentmodule/mark/{id}', 'StudentModulesController@mark');
-
-Route::get('/api/studentmodule/average/{id}', 'StudentModulesController@getaveragemark');
+Route::put('/api/studentmodule/{id}/mark', 'StudentModulesController@mark');
 
 Route::get('/statistics', 'StatisticsController@index');
 
-Route::get('/api/statistics', 'StatisticsController@showstatistics');
+Route::get('/api/statistics/average', 'StatisticsController@getOwnMarks');
+
+Route::get('/api/statistics/{id}/average', 'StatisticsController@getAverageMarks');
 
 Route::get('/module', 'ModuleController@index');
 
-Route::get('/api/module', 'ModuleController@showall');
+Route::get('/api/module', 'ModuleController@showAll');
 
 Route::get('/module/add', 'ModuleController@add');
 
@@ -59,9 +61,9 @@ Route::get('/module/{id}', 'ModuleController@show');
 
 Route::post('/api/module', 'ModuleController@store');
 
-Route::get('/api/module/{id}', 'ModuleController@loadmodule');
+Route::get('/api/module/{id}', 'ModuleController@loadModule');
 
-Route::put('/api/module/{id}', 'ModuleController@editmodule');
+Route::put('/api/module/{id}', 'ModuleController@update');
 
 Route::delete('/api/module/{id}', 'ModuleController@destroy');
 

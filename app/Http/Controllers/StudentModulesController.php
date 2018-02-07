@@ -17,7 +17,7 @@ class StudentModulesController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('teacher', ['only' => ['mark', 'getstudent', 'getaveragemark']]);
+        $this->middleware('teacher', ['only' => ['mark', 'getstudent']]);
     }
 
     /**
@@ -27,8 +27,10 @@ class StudentModulesController extends Controller
      */
     public function index()
     {
-        $cohort = Student::where('student_id', Auth::user()->getID())->pluck('cohort_id')->first();
-        $modules = Cohort::where('id', $cohort)->with('modules.studentModules')->get();
+        $student = Student::where('student_id', Auth::user()->getID())->first();
+        $modules = Cohort::where('id', $student->cohort_id)->with(['modules.studentModules' => function ($query) use ($student) {
+            $query->where('student_id', $student->id);
+        }])->get();
 
         return $modules;
     }
@@ -106,7 +108,7 @@ class StudentModulesController extends Controller
         if (request('student') && Auth::user()->isTeacher()) {
             $student = request('student');
         } else {
-            $student = Student::where('student_id', Auth::user()->getID())->pluck('id')->first();
+            $student = Student::where('student_id', Auth::user()->getID())->first();
         }
 
         $exists = StudentModules::where('student_id', $student)->where('module_id', $id)->first();
@@ -159,7 +161,7 @@ class StudentModulesController extends Controller
     }
 
     //get student with all the related existing studentmodules
-    public function getstudent($id)
+    public function getStudent($id)
     {
         $student = Student::with([
             'cohort.modules.studentModules' => function ($query) use ($id) {
@@ -168,61 +170,5 @@ class StudentModulesController extends Controller
         ])->findOrFail($id);
 
         return $student;
-    }
-
-    //Gets all the modules with mark and names of a student that this current student has too
-    public function getaveragemark(Request $request, $id)
-    {
-        $nameArray = array();
-        $studentArray = array();
-        $averageMarkArray = array();
-        $markArray = array();
-
-        //get all modules what is marked
-        $student = Student::with([
-            'cohort.modules.studentModules' => function ($query) use ($id) {
-                $query->whereNotNull('mark')->where('student_id', $id);
-            }
-        ])->findOrFail($id);
-        
-        $studentModules = $student->cohort->modules;
-
-        $otherStudents = Student::with([
-            //'cohort.modules' => function ($query) use ($studentModules) {
-            //    foreach ($studentModules as $module) {
-            //        $query->where('id', $module->id);
-            //    }
-            //},
-            'cohort.modules.studentModules' => function ($query) use ($id) {
-                $query->whereNotNull('mark')->where('student_id', '!=', $id);
-            }
-        ])->findOrFail($id);
-
-        $otherStudentModules = $otherStudents->cohort->modules;
-
-        //prepare the data for the Vue Chart (average, 0.0, etc)
-        foreach ($otherStudentModules as $osm) {
-            $avg = array();
-            foreach ($osm->studentModules as $studentModule) {
-                if ($studentModule->mark && $studentModule->mark != "0") {
-                    array_push($avg, $studentModule->mark);
-                }
-            }
-            array_push($studentArray, $osm->name);
-            if ($avg == null) {
-                array_push($averageMarkArray, 0.0, 0.0);
-            } else {
-                array_push($averageMarkArray, array_sum($avg)/count($avg), 0.0);
-            }
-        }
-
-        foreach ($studentModules as $sm) {
-            if ($sm->studentModules->first()) {
-                array_push($nameArray, $sm->name);
-                array_push($markArray, $sm->studentModules->first()->mark, 0.0);
-            }
-        }
-
-        return [ "student_labels" => $studentArray, "labels" => $nameArray, "marks" => $markArray, "average_marks" => $averageMarkArray ];
     }
 }

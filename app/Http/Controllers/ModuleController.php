@@ -12,6 +12,7 @@ class ModuleController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('teacher');
     }
 
     public function add()
@@ -19,41 +20,17 @@ class ModuleController extends Controller
         return view('module');
     }
 
-    public function showall()
+    public function showAll()
     {
         return Module::with('cohorts')->get();
     }
 
-    public function loadmodule($id)
+    public function loadModule($id)
     {
         return Module::with('cohorts')->find($id);
     }
 
-    public function editmodule(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            'name' => ['required', 'max:40', Rule::unique('modules')->ignore($id)],
-            'subDescription' => 'max:80',
-            'weekDuration' => 'required|numeric'
-        ]);
-
-        $module = Module::findOrFail($id);
-        $module->name = request('name');
-        $module->sub_description = request('subDescription');
-        $module->week_duration = request('weekDuration');
-        $module->long_description = request('longDescription');
-
-        $cohorts = request('cohorts');
-        $module->cohorts()->sync($cohorts);
-        $module->save();
-        return $module;
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    //Show the modulelist view
     public function index()
     {
         return view('modulelist');
@@ -97,9 +74,8 @@ class ModuleController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * show editmodule view
      *
-     * @param  \App\Module  $module
      * @return \Illuminate\Http\Response
      */
     public function show()
@@ -122,12 +98,28 @@ class ModuleController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Module  $module
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Module $module)
+    public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => ['required', 'max:40', Rule::unique('modules')->ignore($id)],
+            'subDescription' => 'max:80',
+            'weekDuration' => 'required|numeric'
+        ]);
+
+        $module = Module::findOrFail($id);
+        $module->name = request('name');
+        $module->sub_description = request('subDescription');
+        $module->week_duration = request('weekDuration');
+        $module->long_description = request('longDescription');
+
+        $cohorts = request('cohorts');
+        $module->cohorts()->sync($cohorts);
+        $module->save();
+
+        return $module;
     }
 
     /**
@@ -138,8 +130,8 @@ class ModuleController extends Controller
      */
     public function destroy(Module $module, $id)
     {
-        $module = Module::find($id);
+        $module = Module::findOrFail($id);
 
-        $module->delete();
+        return $module->delete();
     }
 }

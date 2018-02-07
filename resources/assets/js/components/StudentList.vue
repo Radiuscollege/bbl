@@ -3,7 +3,7 @@
   <div class="row align-items-start">
   <div class="card">
     <div class="card-body">
-      <h5 class="card-title">Filter</h5>
+      <h5 class="card-title">Sorteer</h5>
       <div class="form-check">
         <input class="form-check-input" type="radio" id="firstname" value="Firstname" v-model="criteria">
         <label class="form-check-label">
@@ -63,7 +63,7 @@ export default {
     return {
       students: [],
       sortedStudents: [],
-      criteria: "",
+      criteria: "Firstname",
       order: "asc",
       search: ""
     };
@@ -80,111 +80,25 @@ export default {
         this.students = res.data;
         this.sortedStudents = this.students;
       });
-    },
+    }
   },
   computed: {
     //checks in which order it must be shown with criteria
     //then checks if the search term string is included in the list
     onSearch: function() {
-      console.log("onsearch");
       var vm = this;
       var obj = [];
-      if (this.criteria === "") {
-        /*
-        //var list = _.orderBy(this.sortedStudents, "first_name");
-        //using arrow function to be able to use this.
-        
-          //return Object.keys(d).map(e => d[e].toLowerCase().includes(vm.search.toLowerCase()));
-          
-        this.sortedStudents = this.students;
-        Object.keys(d).forEach(key => {
-          //wacht ik heb natuurlijk ook nog de cohort object, die kan neit toLowerCase
-            if (_.isString(d[key]))
-            {
-              if (d[key].toLowerCase().includes(this.search.toLowerCase()))
-              {
-                obj.push(d);
-                return;
-              }
-            }
-          console.log(obj);
-          this.sortedStudents = obj;
-          obj = [];
-          //moet het eigenlijk telkens sortedstudents weer opneiuw maken
-
-          //het lijkt net of die iets onthoudt
-
-          return this.sortedStudents;
-          */
-          return this.students;
-          //filter is ook nog een soort van foreach, kijk of ik die kan verwijderen
-          //het probleem is nu namelijk dat de laatste leeg is..., hij moet
-          //de obj onthouden en niet opnieuw leeg maken 
-          //this blijft ook niet, moet vooral this houden.
-          //Alleen als er een letter van de search is veranderd, moet obj weer leeg.
-          //of ik zorg ervoor dat de laatste die die teruggeeft niet leeg is maar dit is gwn zo.
-          //wacht hij is gwn vol nu XD maar hij laat niks zien ofzo.
-            //punt is ook het geeft herhaaldelijk een object terug, dit is dus de allerlaatste
-            //in de foreach, ik zou het nogsteeds in een array moeten doen maar wel eentje dat die ook
-            //echt de student[0]. kan doen.
-            //misschien is het omdat de return niks returns, als ik return bij object.keys toevoeg
-            //veranderd er alleen niks
-            //dus het geeft dingen terug maar alleen true en false, maar dat staat ook eigenlijk dat 
-            //die dat doet maar als ik het los doet doetie t ook
-          
-          //met de d first name
-          //de foreach loop werkt dus gewoon niet....
-          // return d["first_name"].toLowerCase().includes(vm.search.toLowerCase()); dit werkt wel maar de bovenste niet hmmmmmmmmmm. het is gewoon hetzlefde alleen geeft
-          //die de value van bijvoorbeeld de ID direct xD het is of omdat het een integer is, of omdat die niet daadwerkelijk checked in de array maar puur de value
-          //en een value heeft natuurlijk neit includes enz toch..... zou wel meoten xD
-      }
-       else if (vm.criteria === "Firstname") {
-        return _.orderBy(
-          this.students,
-          "first_name",
-          vm.order
-        );
+      if (vm.criteria === "Firstname") {
+        return _.orderBy(this.students, "first_name", vm.order);
       } else if (vm.criteria === "Lastname") {
-        return _.orderBy(
-          this.students,
-          "last_name",
-          vm.order
-        );
+        return _.orderBy(this.students, "last_name", vm.order);
       } else if (vm.criteria === "OVNumber") {
-        return _.orderBy(
-          this.students,
-          "student_id",
-          vm.order
-        );
+        return _.orderBy(this.students, "student_id", vm.order);
       } else if (vm.criteria === "Cohort") {
-        return _.orderBy(
-          this.students,
-          "cohort.name",
-          vm.order
-        );
+        return _.orderBy(this.students, "cohort.name", vm.order);
       } else if (vm.criteria === "Progress") {
-        return _.orderBy(
-          this.students,
-          "progress",
-          vm.order
-        );
+        return _.orderBy(this.students, "progress", vm.order);
       }
-      //kan bijna de if hetzelfde als de first name maken en dan gewoon een foreach doen,...
-      //return _.orderBy(vm.students, 'first_name');
-
-      //ik kan eigenlijk gewoon een for loop doen door elke [""], bij een goede en als die returned dan is het al goed eigenlijk.
-      //Dan moet ik nog wel de orderby goed hebben, misschien door de filter werkt t niet
-      //return v[0]; })) > -1 MAP IT, check if it does something, return the true ones and dont return
-      //something empty back cause if the last one isnt good then it returns empty
-      //but thats the thing, it needs to return the array fi one of the values is good already
-      //but it must be done with looping.... ig eus
-
-      /*
-
-      */
-
-      //de orderby werkt gewoon niet xD hij gaat gewoon in de if..yyyy
-      //ahhhhhhhhhhhhhhhhhhhhhhhhhh hij geeft de keys niet terug, alleen de valeus
     }
   }
 };

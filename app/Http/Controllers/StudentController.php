@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class StudentController extends Controller
@@ -11,7 +12,7 @@ class StudentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('teacher');
+        $this->middleware('teacher', ['except' => ['showall']]);
     }
 
     public function add()
@@ -19,23 +20,27 @@ class StudentController extends Controller
         return view('addstudent');
     }
 
-    public function showall()
+    public function showAll()
     {
-        return Student::with('cohort')->get();
+        if (Auth::user()->isTeacher()) {
+            return Student::with('cohort')->get();
+        } else {
+            return Student::where('student_id', Auth::user()->getID())->first();
+        }
     }
 
-    public function loadstudent(Student $student, $id)
+    public function loadStudent(Student $student, $id)
     {
         return Student::find($id);
     }
 
-    public function studentsearch()
+    public function studentSearch()
     {
         return view('studentsearch');
     }
 
     //splits the search term and returns near identical students
-    public function studentsearchresult(Request $request, $value)
+    public function studentSearchResult(Request $request, $value)
     {
         $words = explode(' ', $value);
         /*
@@ -176,8 +181,11 @@ class StudentController extends Controller
      * @param  \App\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Student $student)
+    public function destroy(Student $student, $id)
     {
-        //
+        $student = Student::findOrFail($id);
+        $student->studentModules()->delete();
+
+        return response()->json($student->delete());
     }
 }
