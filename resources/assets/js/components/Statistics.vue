@@ -31,7 +31,7 @@
       <cohortchart class="col-md-6" v-if="statistics.cohorts" :cohortInfo="statistics.cohorts"></cohortchart>
     </div>
     <hr>
-    <h1>Studenten hoeveelheid per module</h1>
+    <h1>Studenten aantal per module</h1>
     <studentamountchart v-if="statistics.module_info" :moduleInfo="statistics.module_info"></studentamountchart>
     <hr>
     <h1>Module info</h1>
@@ -99,12 +99,9 @@
   </div>
 </template>
 <script>
-import editor from "vue2-medium-editor";
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Popper from 'vue-popperjs';
 import 'vue-popperjs/dist/css/vue-popper.css';
 import markmodal from "./MarkModal";
-import studentaveragechart from "./StudentAverageChart";
 import studentamountchart from "./StudentAmountChart";
 
 export default {
@@ -115,8 +112,6 @@ export default {
     };
   },
   components: {
-    "medium-editor": editor,
-    FontAwesomeIcon,
     'popper': Popper,
     markmodal
   },
@@ -126,7 +121,7 @@ export default {
   methods: {
     getStatistics: function() {
       axios
-        .get("/api/statistics/average")
+        .get("/api/statistics")
         .then(res => {
           this.statistics = res.data;
         })

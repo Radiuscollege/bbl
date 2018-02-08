@@ -49,7 +49,6 @@
 </template>
 <script>
 import editor from "vue2-medium-editor";
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Multiselect from "vue-multiselect";
 import VeeValidate from "vee-validate";
 import fileupload from "./FileUpload";
@@ -82,7 +81,6 @@ export default {
   },
   components: {
     "medium-editor": editor,
-    FontAwesomeIcon,
     Multiselect
   },
   created: function() {

@@ -6,13 +6,14 @@ use App\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('teacher', ['except' => ['showall']]);
+        $this->middleware('teacher', ['except' => ['showAll']]);
     }
 
     public function add()
@@ -20,6 +21,7 @@ class StudentController extends Controller
         return view('addstudent');
     }
 
+    //show list of students to teacher or show studentinfo to student itself
     public function showAll()
     {
         if (Auth::user()->isTeacher()) {
@@ -29,6 +31,7 @@ class StudentController extends Controller
         }
     }
 
+    //show specific student
     public function loadStudent(Student $student, $id)
     {
         return Student::find($id);
@@ -39,11 +42,11 @@ class StudentController extends Controller
         return view('studentsearch');
     }
 
-    //splits the search term and returns near identical students
+    //splits the search term and returns students that contain the search term
     public function studentSearchResult(Request $request, $value)
     {
         $words = explode(' ', $value);
-        /*
+        /* not functioning, can't search on cohortname
         return Student::with(['cohort' => function ($query) use ($words) {
             foreach ($words as $word) {
                 $query->orWhere('name', 'LIKE', '%' . $word . '%');
@@ -154,6 +157,7 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
+            'studentNumber' => ['required|max:20', Rule::unique('students,student_id')->ignore(request('studentNumber'))],
             'firstName' => 'required|max:40',
             'prefix' => 'max:40',
             'lastName' => 'required|max:40',
@@ -166,6 +170,7 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
 
         $student->update([
+            'student_id' => request('studentNumber'),
             'first_name' => request('firstName'),
             'prefix' => request('prefix'),
             'last_name' => request('lastName'),

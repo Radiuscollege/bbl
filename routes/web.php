@@ -37,15 +37,17 @@ Route::delete('/api/student/{id}', 'StudentController@destroy');
 
 Route::get('/api/student/{value}/search', 'StudentController@studentSearchResult');
 
-Route::get('/api/studentmodule', 'StudentModulesController@index');
+Route::get('/api/student/studentmodule', 'StudentModulesController@index');
 
-Route::get('/api/studentmodule/{id}', 'StudentModulesController@getStudent');
+Route::get('/api/student/{id}/studentmodule', 'StudentModulesController@getStudent');
 
 Route::put('/api/studentmodule/{id}/toggle', 'StudentModulesController@toggle');
 
 Route::put('/api/studentmodule/{id}/mark', 'StudentModulesController@mark');
 
 Route::get('/statistics', 'StatisticsController@index');
+
+Route::get('/api/statistics', 'StatisticsController@showStatistics');
 
 Route::get('/api/statistics/average', 'StatisticsController@getOwnMarks');
 

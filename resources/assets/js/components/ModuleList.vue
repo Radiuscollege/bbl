@@ -37,7 +37,6 @@
 </template>
 <script>
 import editor from "vue2-medium-editor";
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 window.$ = window.jQuery = require("jquery");
 
@@ -51,8 +50,7 @@ export default {
   },
   props: ["cohort"],
   components: {
-    "medium-editor": editor,
-    FontAwesomeIcon
+    "medium-editor": editor
   },
   created: function() {
     this.getModules();

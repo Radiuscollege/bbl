@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Student extends Model
 {
@@ -19,16 +20,17 @@ class Student extends Model
         'deleted_at', 'created_at', 'updated_at'
     ];
 
-    protected $appends = ['progress', 'cohort_name'];
+    protected $appends = ['progress', 'estimated_progress'];
 
     public function getProgressAttribute()
     {
-        return ($this->studentModules->where('approved_by', '!=', null)->count() / $this->cohort->modules->count()) * 100;
+        return $this->studentModules->where('approved_by', '!=', null)->count() / $this->cohort->modules->count() * 100;
     }
 
-    public function getCohortNameAttribute()
+    public function getEstimatedProgressAttribute()
     {
-        return $this->cohort->name;
+        $started_date = new Carbon($this->attributes['started_on']);
+        return $this->cohort->modules->sum('week_duration') / $started_date->diffInWeeks(Carbon::today()) * 100;
     }
     
     public function studentModules()

@@ -42,7 +42,7 @@
             label="name" 
             track-by="id">
           </multiselect>
-          <input v-else v-model="student.cohort_name" class="form-control" type="text" placeholder="Cohort">
+          <input v-else v-model="student.cohort.name" class="form-control" type="text" placeholder="Cohort">
         </div>
       </div>
       <div class="form-group row">
@@ -53,9 +53,14 @@
       </div>
       <div v-if="student.progress" class="form-group row">
         <label for="inputPrefix" class="col-sm-2 col-form-label">Geslaagd</label>
-        <div class="col-sm-5">
-          <i v-if="student.progress == 100" class="fas fa-check-square my-auto mr-4"></i>
-          <i v-else class="fas fa-window-close my-auto mr-4"></i>
+        <div class="col-sm-5 my-auto">
+          <span v-if="student.progress == 100" class="fa-layers fa-fw">
+            <i class="fas fa-graduation-cap" data-fa-transform="grow-8"></i>
+          </span>
+          <span v-else class="fa-layers fa-fw">
+            <i class="fas fa-graduation-cap"></i>
+            <i class="fas fa-ban" data-fa-transform="grow-14" style="color: #dc3545;"></i>
+          </span>
         </div>
       </div>
     </fieldset>
@@ -69,7 +74,6 @@
 </template>
 <script>
 import editor from "vue2-medium-editor";
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Multiselect from "vue-multiselect";
 import Datepicker from "vuejs-datepicker";
 import VeeValidate from 'vee-validate';
@@ -103,7 +107,6 @@ export default {
   },
   components: {
     "medium-editor": editor,
-    FontAwesomeIcon,
     Multiselect,
     Datepicker
   },
@@ -113,7 +116,7 @@ export default {
       this.getCohorts();
       if (this.studentInfo) {
         this.student = this.studentInfo;
-        this.selectedObjects = {id: this.student.cohort_id, name: this.student.cohort_name};
+        this.selectedObjects = {id: this.student.cohort_id, name: this.student.cohort.name};
       }
     } 
     else {

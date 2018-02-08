@@ -55,7 +55,6 @@
 </div>
 </template>
 <script>
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "studentlist",
@@ -67,9 +66,6 @@ export default {
       order: "asc",
       search: ""
     };
-  },
-  components: {
-    FontAwesomeIcon
   },
   created: function() {
     this.getStudents();

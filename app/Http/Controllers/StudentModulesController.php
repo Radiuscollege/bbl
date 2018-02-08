@@ -28,9 +28,13 @@ class StudentModulesController extends Controller
     public function index()
     {
         $student = Student::where('student_id', Auth::user()->getID())->first();
-        $modules = Cohort::where('id', $student->cohort_id)->with(['modules.studentModules' => function ($query) use ($student) {
-            $query->where('student_id', $student->id);
-        }])->get();
+        $modules = Cohort::where('id', $student->cohort_id)->with(
+            [
+                'modules.studentModules' => function ($query) use ($student) {
+                    $query->where('student_id', $student->id);
+                }
+            ]
+        )->get();
 
         return $modules;
     }
@@ -154,7 +158,19 @@ class StudentModulesController extends Controller
         if (!$exists) {
             $exists = StudentModules::create($array);
         } else {
-            $exists->update($array);
+            if (request('mark') == null && request('pass') == false) {
+                $exists->update([
+                    'student_id' => request('student'),
+                    'module_id' => $id,
+                    'mark' => null,
+                    'approved_by' => null,
+                    'begin_date' => $beginDate->toDateString(),
+                    'finish_date' => null,
+                    'note' => request('note')
+                ]);
+            } else {
+                $exists->update($array);
+            }
         }
 
         return $exists;

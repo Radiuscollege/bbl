@@ -31,13 +31,13 @@
                   <div class="form-group row">
                     <label for="beginDate" class="col-sm-3 col-form-label">Begindatum:</label>
                     <div class="col-sm-10">
-                      <datepicker v-model="module[0].beginDate"></datepicker>
+                      <datepicker v-model="module[0].beginDate" :disabled="{from: module[0].finishDate}"></datepicker>
                     </div>
                   </div>
                   <div class="form-group row">
                     <label for="finishDate" class="col-sm-3 col-form-label">Einddatum:</label>
                     <div class="col-sm-10">
-                      <datepicker v-model="module[0].finishDate"></datepicker>
+                      <datepicker v-model="module[0].finishDate" :disabled="{to: module[0].beginDate}"></datepicker>
                     </div>
                   </div>
                   <div class="form-group">
@@ -59,7 +59,6 @@
   </div>
 </template>
 <script>
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import Datepicker from "vuejs-datepicker";
 
 export default {
@@ -82,14 +81,13 @@ export default {
   },
   props: ["studentModule"],
   components: {
-    FontAwesomeIcon,
     Datepicker
   },
   methods: {
     setMark: function() {
       this.submitted = true;
       axios
-        .put("/api/studentmodule/"  + this.module[0].id + "/mark", {
+        .put("/api/studentmodule/" + this.module[0].id + "/mark", {
           student: _.last(window.location.pathname.split("/")),
           mark: this.module[0].mark,
           pass: this.module[0].pass,

@@ -18,14 +18,11 @@ class StudentModules extends Model
         'deleted_at', 'created_at', 'updated_at'
     ];
 
-    protected $appends = ['began', 'expected_date', 'pass', 'teacher', 'date_difference'];
+    protected $appends = [
+        'expected_date', 'pass', 'teacher', 'date_difference'
+    ];
 
     protected $dates = ['deleted_at'];
-
-    public function getBeganAttribute()
-    {
-        return $this->attributes['begin_date'] != null;
-    }
 
     //check if the begin date exists, it added an expected date (from Now) without it
     public function getExpectedDateAttribute()

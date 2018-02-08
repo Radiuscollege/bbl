@@ -139,16 +139,23 @@
       </div>
     </div>
   </div>
-  <div v-else>
-    <studentchart :studentModule="studentInfo"></studentchart>
+  <div class="row" v-else>
+    <div class="col-md-4">
+      <h4>Opleiding voortgang</h4>
+      <studentprogresschart class="h-25" :student="studentInfo"></studentprogresschart>
+    </div>
+    <div class="col">
+      <h4>Cijfers</h4>
+      <studentchart :student="studentInfo"></studentchart>
+    </div>
   </div>
 </div>
 </template>
 <script>
 import editor from "vue2-medium-editor";
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import markmodal from "./MarkModal";
 import studentchart from "./StudentChart";
+import studentprogresschart from "./StudentProgressChart";
 
 export default {
   name: "student",
@@ -164,7 +171,6 @@ export default {
   },
   components: {
     "medium-editor": editor,
-    FontAwesomeIcon,
     markmodal
   },
   created: function() {
@@ -174,10 +180,11 @@ export default {
     getModules: function() {
       axios
         .get(
-          "/api/studentmodule/" + _.last(window.location.pathname.split("/"))
+          "/api/student/" + _.last(window.location.pathname.split("/")) + "/studentmodule"
         )
         .then(res => {
           this.studentInfo = res.data;
+          this.studentInfo.cohort.modules = _.orderBy(this.studentInfo.cohort.modules, 'student_modules[0]', 'asc');
         })
         .catch(err => {
           this.error = true;
@@ -222,7 +229,7 @@ export default {
     },
     beganModule: function(moduleID, toggle) {
       axios
-        .put("/api/studentmodule/"  + moduleID + "/toggle", {
+        .put("/api/studentmodule/" + moduleID + "/toggle", {
           student: _.last(window.location.pathname.split("/")),
           began: toggle
         })

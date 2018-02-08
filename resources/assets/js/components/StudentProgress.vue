@@ -134,16 +134,13 @@
       </div>
     </div>
   <div v-else>
-    <studentchart :studentModule="moduleList" :isStudent="true"></studentchart>
+    <studentchart :student="moduleList" :isStudent="true"></studentchart>
   </div>
-    <studentchart :studentModule="moduleList" :isStudent="true"></studentchart>
-  
 </div>
 </div>
 </template>
 <script>
 import editor from "vue2-medium-editor";
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import studentchart from "./StudentChart";
 
 export default {
@@ -159,7 +156,6 @@ export default {
   },
   components: {
     "medium-editor": editor,
-    FontAwesomeIcon,
     studentchart
   },
   created: function() {
@@ -168,9 +164,10 @@ export default {
   methods: {
     getModules: function() {
       axios
-        .get("/api/studentmodule")
+        .get("/api/student/studentmodule")
         .then(res => {
           this.moduleList = res.data;
+          this.moduleList[0].modules = _.orderBy(this.moduleList[0].modules, 'student_modules[0]', 'asc');
         })
         .catch(err => {
           this.error = true;

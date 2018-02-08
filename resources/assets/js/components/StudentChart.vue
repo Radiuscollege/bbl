@@ -9,7 +9,7 @@ export default {
       markAverage: []
     };
   },
-  props: ["studentModule", "isStudent"],
+  props: ["student", "isStudent"],
   created: function() {
     this.getAverage();
   },
@@ -30,11 +30,11 @@ export default {
               datasets: [
                 {
                   label:
-                    this.studentModule.first_name +
-                    (this.studentModule.prefix == null
+                    this.student.first_name +
+                    (this.student.prefix == null
                       ? " "
-                      : " " + this.studentModule.prefix + " ") +
-                    this.studentModule.last_name,
+                      : " " + this.student.prefix + " ") +
+                    this.student.last_name,
                   backgroundColor: "#f87979",
                   data: this.markAverage.marks
                 },
