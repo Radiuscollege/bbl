@@ -12,7 +12,7 @@
             Uitleg
           </a>
           <div class="float-right"><a v-bind:href="'/module/' + module.id" role="button" class="btn btn-primary">Wijzigen</a>
-          <button v-if="!module.used" v-on:click="deleteModule(module.id)" role="button" class="btn btn-danger">Verwijderen</button>
+          <button v-if="!module.used" v-on:click="deleteModule(module.id)" :disabled="submittedDelete" role="button" class="btn btn-danger">Verwijderen</button>
           </div>
           <div :id="'collapse' + module.id" class="collapse" role="tabpanel" aria-labelledby="heading" data-parent="#accordion">
             <div class="card-body">
@@ -45,7 +45,8 @@ export default {
   data: function() {
     return {
       modules: [],
-      options: { disableEditing: true, toolbar: false, placeholder: false }
+      options: { disableEditing: true, toolbar: false, placeholder: false },
+      submittedDelete: false
     };
   },
   props: ["cohort"],
@@ -62,8 +63,10 @@ export default {
       });
     },
     deleteModule: function(id) {
+      this.submittedDelete = true;
       axios.delete("/api/module/" + id).then(res => {
         this.getModules();
+        this.submittedDelete = false;
       });
     }
   },

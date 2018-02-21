@@ -105,8 +105,8 @@ class ModuleController extends Controller
     {
         $validatedData = $request->validate([
             'name' => ['required', 'max:40', Rule::unique('modules')->ignore($id)],
-            'subDescription' => 'max:80',
-            'weekDuration' => 'required|numeric'
+            'subDescription' => 'max:140',
+            'weekDuration' => 'required|numeric|max:999'
         ]);
 
         $module = Module::findOrFail($id);
@@ -131,7 +131,7 @@ class ModuleController extends Controller
     public function destroy(Module $module, $id)
     {
         $module = Module::findOrFail($id);
-
-        return $module->delete();
+        $module->delete();
+        return;
     }
 }

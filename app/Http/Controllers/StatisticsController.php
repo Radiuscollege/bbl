@@ -43,7 +43,7 @@ class StatisticsController extends Controller
             $query->where('approved_by', null);
         },
         'studentModules as finished_modules_count' => function ($query) {
-            $query->where('approved_by', '!=', null);
+            $query->whereNotNull('approved_by');
         }, 'studentModules as avg_mark' => function ($query) {
             $query->select(DB::raw('avg(mark) average'));
         },
@@ -67,7 +67,7 @@ class StatisticsController extends Controller
 
     public function getOwnMarks(Request $request)
     {
-        $id = Student::where('student_id', Auth::user()->getID())->first();
+        $id = Student::where('student_id', Auth::user()->getID())->first()->id;
         $student = Student::with([
             'cohort.modules.studentModules' => function ($query) use ($id) {
                 $query->whereNotNull('mark')->where('student_id', $id);
@@ -80,12 +80,10 @@ class StatisticsController extends Controller
     private function getStatistics($student, $id)
     {
         $nameArray = array();
-        $averageNameArray = array();
         $averageMarkArray = array();
         $markArray = array();
-        
         $studentModules = $student->cohort->modules;
-
+        
         $otherStudents = Student::with([
             'cohort.modules.studentModules' => function ($query) use ($id) {
                 $query->whereNotNull('mark')->where('student_id', '!=', $id);
@@ -93,7 +91,7 @@ class StatisticsController extends Controller
         ])->findOrFail($id);
 
         $otherStudentModules = $otherStudents->cohort->modules;
-
+        
         foreach ($studentModules as $sm) {
             if ($sm->studentModules->first()) {
                 array_push($nameArray, $sm->name);

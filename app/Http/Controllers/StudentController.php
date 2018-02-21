@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Validator;
 use App\Student;
+use App\Cohort;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -13,7 +15,7 @@ class StudentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('teacher', ['except' => ['showAll']]);
+        $this->middleware('teacher', ['except' => ['showAll', 'showOwn']]);
     }
 
     public function add()
@@ -27,8 +29,22 @@ class StudentController extends Controller
         if (Auth::user()->isTeacher()) {
             return Student::with('cohort')->get();
         } else {
-            return Student::where('student_id', Auth::user()->getID())->first();
+            $student = Student::where('student_id', Auth::user()->getID())->first();
+            $modules = Cohort::where('id', $student->cohort_id)->with(
+                [
+                    'modules.studentModules' => function ($query) use ($student) {
+                        $query->where('student_id', $student->id);
+                    }
+                ]
+            )->get();
+    
+            return $modules;
         }
+    }
+
+    public function showOwn()
+    {
+        return Student::where('student_id', Auth::user()->getID())->first();
     }
 
     //show specific student
@@ -115,7 +131,6 @@ class StudentController extends Controller
             'prefix' => request('prefix'),
             'last_name' => request('lastName'),
             'started_on' => $finalDate,
-            'graduated' => false,
         ]);
 
         $cohorts = request('cohorts');
@@ -156,13 +171,15 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'studentNumber' => ['required|max:20', Rule::unique('students,student_id')->ignore(request('studentNumber'))],
+        //validates and checks if student_id already exists except the previous id
+        Validator::make($request->all(), [
+            'student_id' => ['required', 'max:20',
+            Rule::unique('students')->ignore(request('student_id'), 'student_id')],
             'firstName' => 'required|max:40',
             'prefix' => 'max:40',
             'lastName' => 'required|max:40',
             'date' => 'required|date',
-        ]);
+        ])->validate();
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
@@ -170,7 +187,7 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
 
         $student->update([
-            'student_id' => request('studentNumber'),
+            'student_id' => request('student_id'),
             'first_name' => request('firstName'),
             'prefix' => request('prefix'),
             'last_name' => request('lastName'),

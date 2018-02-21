@@ -3,7 +3,7 @@
     <h1>Cohort info</h1>
     <button v-on:click="print" class="btn btn-primary float-right d-print-none">Uitprinten</button>
     <div class="row">
-      <div class="card my-auto col-md-6">
+      <div class="card my-auto col-6">
         <ul class="list-group list-group-flush text-center">
           <li class="list-group-item">
             Er zijn momenteel {{statistics.student_amount}} studenten met de AMO opleiding bezig
@@ -28,7 +28,7 @@
           </li>
         </ul>
       </div>
-      <cohortchart class="col-md-6" v-if="statistics.cohorts" :cohortInfo="statistics.cohorts"></cohortchart>
+      <cohortchart class="col-6" v-if="statistics.cohorts" :cohortInfo="statistics.cohorts"></cohortchart>
     </div>
     <hr>
     <h1>Studenten aantal per module</h1>

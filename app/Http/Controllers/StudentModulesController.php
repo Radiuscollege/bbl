@@ -105,14 +105,14 @@ class StudentModulesController extends Controller
         //
     }
 
-    //Check if its student or teacher (to prevent students from toggling other students modules)
-    //then either add or remove the begin_date
+    //Check if its a student or teacher (to prevent students from toggling other students modules)
+    //then either add or remove the begin_date if the studentmodule isn't approved yet
     public function toggle(Request $request, $id)
     {
         if (request('student') && Auth::user()->isTeacher()) {
             $student = request('student');
         } else {
-            $student = Student::where('student_id', Auth::user()->getID())->first();
+            $student = Student::where('student_id', Auth::user()->getID())->first()->id;
         }
 
         $exists = StudentModules::where('student_id', $student)->where('module_id', $id)->first();
@@ -145,6 +145,17 @@ class StudentModulesController extends Controller
 
         $finishDate = new Carbon(request('finishDate'));
         
+        //check if begindate is after to finishdate, return error if so. I use it in this way instead of in the laravel validation
+        //because before_or_equal in laravel will call a datetime converter PHP function but I already converted the string to a datetime with carbon
+        if ($beginDate->gt($finishDate)) {
+            return response()->json('Begindatum is later dan de einddatum', 500);
+        }
+        $validatedData = $request->validate([
+            'mark' => 'numeric|nullable|max:10',
+            //'begin_date' => 'required|before_or_equal:finish_date', //gte() //lte
+            //'finish_date' => 'required|after_or_equal:begin_date'
+        ]);
+
         $array = [
             'student_id' => request('student'),
             'module_id' => $id,
@@ -182,7 +193,7 @@ class StudentModulesController extends Controller
         $student = Student::with([
             'cohort.modules.studentModules' => function ($query) use ($id) {
                 $query->where('student_id', $id);
-            } , 'cohort.modules.studentModules.user:name'
+            }
         ])->findOrFail($id);
 
         return $student;

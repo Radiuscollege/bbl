@@ -31,13 +31,15 @@ Route::put('/api/student/{id}', 'StudentController@update');
 
 Route::get('/api/student', 'StudentController@showAll');
 
+Route::get('/api/student/own', 'StudentController@showOwn');
+
 Route::get('/api/student/{id}', 'StudentController@loadStudent');
 
 Route::delete('/api/student/{id}', 'StudentController@destroy');
 
 Route::get('/api/student/{value}/search', 'StudentController@studentSearchResult');
 
-Route::get('/api/student/studentmodule', 'StudentModulesController@index');
+Route::get('/api/student/studentmodule', 'StudentController@getStudentModules');
 
 Route::get('/api/student/{id}/studentmodule', 'StudentModulesController@getStudent');
 

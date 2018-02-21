@@ -12,11 +12,14 @@
                 </button>
               </div>
               <div class="modal-body">
+                <div v-if="error" class="alert alert-danger">
+                    {{error}}
+                </div>
                 <form>
                   <div class="form-group row">
                     <label for="inputMark" class="col-sm-2 col-form-label">Cijfer:</label>
                     <div class="col">
-                      <input v-model="module[0].mark" type="number" class="form-control" placeholder="0.0" step="0.1" min="0" max="10">
+                      <input v-validate="'decimal:1|max_value:10'" name="mark" v-model="module[0].mark" type="number" :class="{ 'input': true, 'form-control': true, 'invalid': errors.has('mark') }" placeholder="0.0" step="0.1" min="0" max="10">
                     </div>
                     <label for="or" class="col-sm-2 col-form-label">of</label>
                     <div class="col my-auto">
@@ -49,7 +52,7 @@
                 </form>
               </div>
               <div class="modal-footer">
-                <button v-on:click="setMark(); $emit('close');" :disabled="submitted" type="button" class="btn btn-primary">Beoordeel</button>
+                <button v-on:click="validateForm" :disabled="submitted" type="button" class="btn btn-primary">Beoordeel</button>
               </div>
             </div>
           </div>
@@ -60,6 +63,7 @@
 </template>
 <script>
 import Datepicker from "vuejs-datepicker";
+import VeeValidate from "vee-validate";
 
 export default {
   name: "markmodal",
@@ -76,7 +80,8 @@ export default {
         }
       ],
       format: "yyyy-MM-dd",
-      submitted: false
+      submitted: false,
+      error: ""
     };
   },
   props: ["studentModule"],
@@ -95,8 +100,22 @@ export default {
           finishDate: this.module[0].finishDate,
           note: this.module[0].note
         })
-        .then(res => {})
-        .catch(err => console.error(err));
+        .then(res => {
+          this.$emit("close");
+        })
+        .catch(err => {
+          this.error = err.response.data;
+          this.submitted = false;
+        });
+    },
+    validateForm: function() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          this.setMark();
+          return;
+        }
+        this.error = "Je hebt iets incorrect ingevuld.";
+      });
     }
   }
 };

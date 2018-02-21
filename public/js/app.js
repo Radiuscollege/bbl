@@ -76868,7 +76868,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         labels: _.map(this.cohortInfo, "name"),
         datasets: [{
           label: "Studenten bezig",
-          backgroundColor: ["#41B883", "#E46651", "#00D8FF", "#DD1B16"],
+          //random list color generator would be handy once there are a lot of cohorts
+          backgroundColor: ["#41B883", "#E46651", "#00D8FF", "#DD1B16", "#007bff", "#212529", "#f8f9fa", "#6f42c1", "#ffc107", "#6c757d"],
           data: _.map(this.cohortInfo, "student_cohort_count")
         }]
       }
@@ -90257,6 +90258,7 @@ module.exports = function listToStyles (parentId, list) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuejs_datepicker__ = __webpack_require__(145);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuejs_datepicker___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vuejs_datepicker__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vee_validate__ = __webpack_require__(147);
 //
 //
 //
@@ -90317,6 +90319,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+
 
 
 
@@ -90333,7 +90339,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         note: this.studentModule.note
       }],
       format: "yyyy-MM-dd",
-      submitted: false
+      submitted: false,
+      error: ""
     };
   },
   props: ["studentModule"],
@@ -90342,6 +90349,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
   methods: {
     setMark: function setMark() {
+      var _this = this;
+
       this.submitted = true;
       axios.put("/api/studentmodule/" + this.module[0].id + "/mark", {
         student: _.last(window.location.pathname.split("/")),
@@ -90350,8 +90359,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         beginDate: this.module[0].beginDate,
         finishDate: this.module[0].finishDate,
         note: this.module[0].note
-      }).then(function (res) {}).catch(function (err) {
-        return console.error(err);
+      }).then(function (res) {
+        _this.$emit("close");
+      }).catch(function (err) {
+        _this.error = err.response.data;
+        _this.submitted = false;
+      });
+    },
+    validateForm: function validateForm() {
+      var _this2 = this;
+
+      this.$validator.validateAll().then(function (result) {
+        if (result) {
+          _this2.setMark();
+          return;
+        }
+        _this2.error = "Je hebt iets incorrect ingevuld.";
       });
     }
   }
@@ -90406,6 +90429,16 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-body" }, [
+                    _vm.error
+                      ? _c("div", { staticClass: "alert alert-danger" }, [
+                          _vm._v(
+                            "\n                  " +
+                              _vm._s(_vm.error) +
+                              "\n              "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
                     _c("form", [
                       _c("div", { staticClass: "form-group row" }, [
                         _c(
@@ -90421,14 +90454,25 @@ var render = function() {
                           _c("input", {
                             directives: [
                               {
+                                name: "validate",
+                                rawName: "v-validate",
+                                value: "decimal:1|max_value:10",
+                                expression: "'decimal:1|max_value:10'"
+                              },
+                              {
                                 name: "model",
                                 rawName: "v-model",
                                 value: _vm.module[0].mark,
                                 expression: "module[0].mark"
                               }
                             ],
-                            staticClass: "form-control",
+                            class: {
+                              input: true,
+                              "form-control": true,
+                              invalid: _vm.errors.has("mark")
+                            },
                             attrs: {
+                              name: "mark",
                               type: "number",
                               placeholder: "0.0",
                               step: "0.1",
@@ -90627,12 +90671,7 @@ var render = function() {
                       {
                         staticClass: "btn btn-primary",
                         attrs: { disabled: _vm.submitted, type: "button" },
-                        on: {
-                          click: function($event) {
-                            _vm.setMark()
-                            _vm.$emit("close")
-                          }
-                        }
+                        on: { click: _vm.validateForm }
                       },
                       [_vm._v("Beoordeel")]
                     )
@@ -90754,7 +90793,7 @@ exports.push([module.i, "\n.is-danger .multiselect__tags {\n  border-color: red;
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue2_medium_editor__ = __webpack_require__(11);
+/* WEBPACK VAR INJECTION */(function(module) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue2_medium_editor__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue2_medium_editor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue2_medium_editor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_multiselect__ = __webpack_require__(146);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_multiselect___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_multiselect__);
@@ -90834,7 +90873,8 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
       options: { placeholder: { text: "Voeg hier een beschrijving toe" } },
       submitted: false,
       error: "",
-      attachment: { name: null, file: null }
+      attachment: { name: null, file: null },
+      text: ""
     };
   },
   watch: {
@@ -90854,7 +90894,7 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
   },
   methods: {
     processEditOperation: function processEditOperation(operation) {
-      this.text = operation.api.origElements.innerHTML;
+      this.module.long_description = operation.api.origElements.innerHTML;
     },
     getCohorts: function getCohorts() {
       var _this = this;
@@ -90869,6 +90909,7 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
       if (Number.isInteger(parseInt(_.last(window.location.pathname.split("/"))))) {
         axios.get("/api/module/" + _.last(window.location.pathname.split("/"))).then(function (res) {
           _this2.module = res.data;
+          _this2.text = module.long_description;
           _this2.selectedObjects = [];
           //this.module.cohorts.forEach(function(element) {
           //  this.selectedObjects.push({id: element.pivot.cohort_id, name: element.name})
@@ -90892,7 +90933,7 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
           subDescription: this.module.sub_description,
           weekDuration: this.module.week_duration,
           cohorts: this.selectedIds,
-          longDescription: this.text
+          longDescription: this.module.long_description
         }).then(function (res) {
           document.location.href = "../module";
         }).catch(function (err) {
@@ -90905,12 +90946,11 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
           subDescription: this.module.sub_description,
           weekDuration: this.module.week_duration,
           cohorts: this.selectedIds,
-          longDescription: this.text
+          longDescription: this.module.long_description
         }).then(function (res) {
           document.location.href = "../module";
         }).catch(function (err) {
           _this3.submitted = false;
-          console.log(err);
           _this3.error = err.response.data.errors.name[0];
         });
       }
@@ -90923,22 +90963,25 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
           _this4.saveModule();
           return;
         }
-        _this4.error = "Je bent vergeten om iets in te vullen.";
+        _this4.error = "Je hebt iets incorrect ingevuld.";
       });
-    },
-    onFileChange: function onFileChange(e) {
-      console.log("FILECHANGE");
-      this.attachment.file = e.target.files || e.dataTransfer.files;
-      this.attachment.name = e.target.name;
-
-      var data = new FormData();
-      data.append("attachment", this.attachment.file);
-      axios.post("/api/upload/" + _.last(window.location.pathname.split("/"), data, {
-        headers: { "Content-Type": "multipart/form-data" }
-      }));
-    }
+    } /*
+      onFileChange(e) {
+       console.log("FILECHANGE");
+       this.attachment.file = e.target.files || e.dataTransfer.files;
+       this.attachment.name = e.target.name;
+        var data = new FormData();
+       data.append("attachment", this.attachment.file);
+       axios.post(
+         "/api/upload/" +
+           _.last(window.location.pathname.split("/"), data, {
+             headers: { "Content-Type": "multipart/form-data" }
+           })
+       );
+      }*/
   }
 });
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(288)(module)))
 
 /***/ }),
 /* 248 */
@@ -93104,8 +93147,8 @@ var render = function() {
               {
                 name: "validate",
                 rawName: "v-validate",
-                value: "required",
-                expression: "'required'"
+                value: "required|max:40",
+                expression: "'required|max:40'"
               },
               {
                 name: "model",
@@ -93147,14 +93190,28 @@ var render = function() {
           _c("input", {
             directives: [
               {
+                name: "validate",
+                rawName: "v-validate",
+                value: "max:140",
+                expression: "'max:140'"
+              },
+              {
                 name: "model",
                 rawName: "v-model",
                 value: _vm.module.sub_description,
                 expression: "module.sub_description"
               }
             ],
-            staticClass: "form-control",
-            attrs: { type: "text", placeholder: "Sub beschrijving" },
+            class: {
+              input: true,
+              "form-control": true,
+              invalid: _vm.errors.has("subDescription")
+            },
+            attrs: {
+              name: "subDescription",
+              type: "text",
+              placeholder: "Sub beschrijving"
+            },
             domProps: { value: _vm.module.sub_description },
             on: {
               input: function($event) {
@@ -93399,7 +93456,8 @@ window.$ = __webpack_provided_window_dot_jQuery = __webpack_require__(8);
   data: function data() {
     return {
       modules: [],
-      options: { disableEditing: true, toolbar: false, placeholder: false }
+      options: { disableEditing: true, toolbar: false, placeholder: false },
+      submittedDelete: false
     };
   },
   props: ["cohort"],
@@ -93420,8 +93478,10 @@ window.$ = __webpack_provided_window_dot_jQuery = __webpack_require__(8);
     deleteModule: function deleteModule(id) {
       var _this2 = this;
 
+      this.submittedDelete = true;
       axios.delete("/api/module/" + id).then(function (res) {
         _this2.getModules();
+        _this2.submittedDelete = false;
       });
     }
   },
@@ -93497,7 +93557,10 @@ var render = function() {
                             "button",
                             {
                               staticClass: "btn btn-danger",
-                              attrs: { role: "button" },
+                              attrs: {
+                                disabled: _vm.submittedDelete,
+                                role: "button"
+                              },
                               on: {
                                 click: function($event) {
                                   _vm.deleteModule(module.id)
@@ -94298,7 +94361,7 @@ var render = function() {
         "div",
         { staticClass: "row" },
         [
-          _c("div", { staticClass: "card my-auto col-md-6" }, [
+          _c("div", { staticClass: "card my-auto col-6" }, [
             _c(
               "ul",
               { staticClass: "list-group list-group-flush text-center" },
@@ -94409,7 +94472,7 @@ var render = function() {
           _vm._v(" "),
           _vm.statistics.cohorts
             ? _c("cohortchart", {
-                staticClass: "col-md-6",
+                staticClass: "col-6",
                 attrs: { cohortInfo: _vm.statistics.cohorts }
               })
             : _vm._e()
@@ -94908,6 +94971,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -94923,7 +95000,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       modalVisible: false,
       modalData: null,
       showModules: true,
-      error: false
+      error: false,
+      submittedBegin: false
     };
   },
   components: {
@@ -94939,7 +95017,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
       axios.get("/api/student/" + _.last(window.location.pathname.split("/")) + "/studentmodule").then(function (res) {
         _this.studentInfo = res.data;
-        _this.studentInfo.cohort.modules = _.orderBy(_this.studentInfo.cohort.modules, 'student_modules[0]', 'asc');
+        _this.submittedBegin = false;
+        //sort by approved modules, after that by a started module
+        _this.studentInfo.cohort.modules = _.sortBy(_this.studentInfo.cohort.modules, [function (module) {
+          if (module.student_modules[0]) {
+            return module.student_modules[0].approved_by;
+          }
+        }, function (module) {
+          if (module.student_modules[0]) {
+            return module.student_modules[0].begin_date;
+          }
+        }]);
       }).catch(function (err) {
         _this.error = true;
       });
@@ -94983,11 +95071,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     beganModule: function beganModule(moduleID, toggle) {
       var _this2 = this;
 
+      this.submittedBegin = true;
       axios.put("/api/studentmodule/" + moduleID + "/toggle", {
         student: _.last(window.location.pathname.split("/")),
         began: toggle
       }).then(function (res) {
-        return _this2.getModules();
+        _this2.getModules();
       });
     },
     closeModal: function closeModal() {
@@ -95081,7 +95170,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   props: ["student"],
   created: function created() {},
   mounted: function mounted() {
-    console.log(this.student);
     this.datacollection = {
       datacollection: {
         datasets: [{
@@ -95118,580 +95206,636 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "container" },
-    [
-      _vm.error
-        ? _c(
-            "div",
-            { staticClass: "modal-dialog", attrs: { role: "document" } },
-            [_vm._m(0)]
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      _c("studentform", { attrs: { studentInfo: _vm.studentInfo } }),
-      _vm._v(" "),
-      _c("hr"),
-      _vm._v(" "),
-      _c("div", { staticClass: "text-center mb-5 d-print-none" }, [
-        _c(
-          "a",
-          {
-            staticClass: "btn btn-primary btn-lg active",
-            attrs: { role: "button", "aria-pressed": "true" },
-            on: {
-              click: function($event) {
-                _vm.showModules = true
-              }
-            }
-          },
-          [_vm._v("Modules")]
-        ),
-        _vm._v(" "),
-        _c(
-          "a",
-          {
-            staticClass: "btn btn-primary btn-lg active",
-            attrs: { role: "button", "aria-pressed": "true" },
-            on: {
-              click: function($event) {
-                _vm.showModules = false
-              }
-            }
-          },
-          [_vm._v("Statistieken")]
+  return _c("div", { staticClass: "container" }, [
+    _vm.error
+      ? _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [_vm._m(0)]
         )
-      ]),
-      _vm._v(" "),
-      _vm.showModules
-        ? _c(
-            "div",
-            [
-              _vm.modalVisible
-                ? _c("markmodal", {
-                    attrs: { studentModule: _vm.modalData },
-                    on: { close: _vm.closeModal }
-                  })
-                : _vm._e(),
+      : _c(
+          "span",
+          [
+            _c("studentform", { attrs: { studentInfo: _vm.studentInfo } }),
+            _vm._v(" "),
+            _c("hr"),
+            _vm._v(" "),
+            _c("div", { staticClass: "text-center mb-5 d-print-none" }, [
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-primary btn-lg active",
+                  attrs: { role: "button", "aria-pressed": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.showModules = true
+                    }
+                  }
+                },
+                [_vm._v("Modules")]
+              ),
               _vm._v(" "),
-              _vm._l(_vm.studentInfo.cohort.modules, function(module, index) {
-                return _vm.studentInfo.cohort
-                  ? _c(
-                      "div",
-                      {
-                        key: module.id,
-                        staticClass: "row pt-3 pb-3",
-                        staticStyle: { "border-bottom": "1px solid #ccc" }
-                      },
-                      [
-                        _c("div", { staticClass: "col-2 my-auto" }, [
-                          index == 0
-                            ? _c("h4", { staticClass: "text-center" }, [
-                                _vm._v("Naam")
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "card bg-light" }, [
-                            _c(
-                              "div",
-                              { staticClass: "card-header text-center p-2" },
-                              [_vm._v(_vm._s(module.name))]
-                            ),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "card-body p-2" }, [
-                              _c(
-                                "p",
-                                { staticClass: "card-text text-center" },
-                                [_vm._v(_vm._s(module.sub_description))]
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c(
-                              "div",
-                              {
-                                staticClass:
-                                  "card-footer bg-transparent border-success"
-                              },
-                              [
-                                _c(
-                                  "a",
-                                  {
-                                    attrs: {
-                                      "data-toggle": "collapse",
-                                      href: "#collapse" + module.id,
-                                      "aria-expanded": "true",
-                                      "aria-controls": "collapse" + module.id
-                                    }
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\r\n              Uitleg\r\n            "
-                                    )
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  {
-                                    staticClass: "collapse",
-                                    attrs: {
-                                      id: "collapse" + module.id,
-                                      role: "tabpanel",
-                                      "aria-labelledby": "heading",
-                                      "data-parent": "#accordion"
-                                    }
-                                  },
-                                  [
-                                    _c(
-                                      "div",
-                                      { staticClass: "card-body p-0" },
-                                      [
-                                        _c("medium-editor", {
-                                          attrs: {
-                                            text: module.long_description,
-                                            options: _vm.options
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    )
-                                  ]
-                                )
-                              ]
-                            )
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-2 my-auto" }, [
-                          index == 0
-                            ? _c("h4", { staticClass: "text-center" }, [
-                                _vm._v("Duur")
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "card text-center" }, [
-                            _c("div", { staticClass: "card-body" }, [
-                              _c("p", { staticClass: "card-text" }, [
-                                _vm._v(
-                                  _vm._s(module.week_duration / 8) + " periode"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("p", { staticClass: "card-text" }, [
-                                _vm._v("=")
-                              ]),
-                              _vm._v(" "),
-                              _c("p", { staticClass: "card-text" }, [
-                                _vm._v(_vm._s(module.week_duration) + " weken")
-                              ])
-                            ])
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-2 my-auto" }, [
-                          index == 0
-                            ? _c("h4", { staticClass: "text-center" }, [
-                                _vm._v("Begindatum")
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "card text-center" }, [
-                            module.student_modules[0] &&
-                            module.student_modules[0].begin_date
-                              ? _c("div", { staticClass: "card-body" }, [
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(
-                                      _vm._s(
-                                        module.student_modules[0].begin_date
-                                      )
-                                    )
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ])
-                                ])
-                              : _c("div", { staticClass: "card-body" }, [
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ])
-                                ])
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-2 my-auto" }, [
-                          index == 0
-                            ? _c("h4", { staticClass: "text-center" }, [
-                                _vm._v("Einddatum")
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "card text-center" }, [
-                            module.student_modules[0]
-                              ? _c("div", { staticClass: "card-body" }, [
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(
-                                      _vm._s(
-                                        module.student_modules[0].finish_date
-                                      )
-                                    )
-                                  ]),
-                                  _vm._v(" "),
-                                  module.student_modules[0].begin_date
-                                    ? _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(
-                                          "Geschatte einddatum: \r\n              " +
-                                            _vm._s(
-                                              module.student_modules[0]
-                                                .expected_date
-                                            ) +
-                                            "\r\n            "
-                                        )
-                                      ])
-                                    : _c("div", { staticClass: "card-text" }, [
-                                        _c("p", [_vm._v(" ")]),
-                                        _vm._v(" "),
-                                        _c("p", [_vm._v(" ")])
-                                      ])
-                                ])
-                              : _c("div", { staticClass: "card-body" }, [
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ])
-                                ])
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-2 my-auto" }, [
-                          index == 0
-                            ? _c("h4", { staticClass: "text-center" }, [
-                                _vm._v("Beoordeling")
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "card text-center" }, [
-                            !module.student_modules[0] ||
-                            (module.student_modules[0].pass == false &&
-                              module.student_modules[0].mark === null)
-                              ? _c("div", { staticClass: "card-body" }, [
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-primary btn-lg active",
+                  attrs: { role: "button", "aria-pressed": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.showModules = false
+                    }
+                  }
+                },
+                [_vm._v("Statistieken")]
+              )
+            ]),
+            _vm._v(" "),
+            _vm.showModules
+              ? _c(
+                  "div",
+                  [
+                    _vm._m(1),
+                    _vm._v(" "),
+                    _vm.modalVisible
+                      ? _c("markmodal", {
+                          attrs: { studentModule: _vm.modalData },
+                          on: { close: _vm.closeModal }
+                        })
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm._l(_vm.studentInfo.cohort.modules, function(module) {
+                      return _vm.studentInfo.cohort
+                        ? _c(
+                            "div",
+                            {
+                              key: module.id,
+                              staticClass: "row pt-3 pb-3",
+                              staticStyle: { "border-bottom": "1px solid #ccc" }
+                            },
+                            [
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card bg-light" }, [
                                   _c(
-                                    "button",
+                                    "div",
                                     {
-                                      staticClass:
-                                        "btn btn-primary d-print-none",
-                                      attrs: { type: "button" },
-                                      on: {
-                                        click: function($event) {
-                                          _vm.openModal(module)
-                                        }
-                                      }
+                                      staticClass: "card-header text-center p-2"
                                     },
-                                    [
-                                      _vm._v(
-                                        "\r\n              Accorderen\r\n            "
-                                      )
-                                    ]
+                                    [_vm._v(_vm._s(module.name))]
                                   ),
                                   _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
+                                  _c("div", { staticClass: "card-body p-2" }, [
+                                    _c(
+                                      "p",
+                                      { staticClass: "card-text text-center" },
+                                      [_vm._v(_vm._s(module.sub_description))]
+                                    )
+                                  ]),
+                                  _vm._v(" "),
+                                  module.long_description
+                                    ? _c(
+                                        "div",
+                                        {
+                                          staticClass:
+                                            "card-footer bg-transparent border-success"
+                                        },
+                                        [
+                                          _c(
+                                            "a",
+                                            {
+                                              attrs: {
+                                                "data-toggle": "collapse",
+                                                href: "#collapse" + module.id,
+                                                "aria-expanded": "true",
+                                                "aria-controls":
+                                                  "collapse" + module.id
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                "\r\n                Uitleg\r\n              "
+                                              )
+                                            ]
+                                          )
+                                        ]
+                                      )
+                                    : _vm._e()
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  _c("div", { staticClass: "card-body" }, [
+                                    _c("p", { staticClass: "card-text" }, [
+                                      _vm._v(
+                                        _vm._s(module.week_duration / 8) +
+                                          " periode"
+                                      )
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("p", { staticClass: "card-text" }, [
+                                      _vm._v("=")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("p", { staticClass: "card-text" }, [
+                                      _vm._v(
+                                        _vm._s(module.week_duration) + " weken"
+                                      )
+                                    ])
                                   ])
                                 ])
-                              : module.student_modules[0]
-                                ? _c("div", { staticClass: "card-body pt-2" }, [
-                                    module.student_modules[0].teacher
-                                      ? _c("p", [
-                                          _vm._v(
-                                            "\r\n              ✓ " +
-                                              _vm._s(
-                                                module.student_modules[0]
-                                                  .teacher
-                                              ) +
-                                              "\r\n            "
-                                          )
-                                        ])
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    module.student_modules[0].mark
-                                      ? _c("p", [
-                                          _vm._v(
-                                            "\r\n              " +
-                                              _vm._s(
-                                                module.student_modules[0].mark
-                                              ) +
-                                              "\r\n            "
-                                          )
-                                        ])
-                                      : module.student_modules[0].approved_by
-                                        ? _c("p", [
-                                            _vm._v(
-                                              "\r\n              " +
-                                                _vm._s(
-                                                  module.student_modules[0]
-                                                    .approved_by
-                                                ) +
-                                                "\r\n            "
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  module.student_modules[0] &&
+                                  module.student_modules[0].begin_date
+                                    ? _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        module.student_modules[0].begin_date !=
+                                        true
+                                          ? _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    module.student_modules[0]
+                                                      .begin_date
+                                                  )
+                                                )
+                                              ]
                                             )
-                                          ])
-                                        : _vm._e(),
-                                    _vm._v(" "),
-                                    _c(
-                                      "button",
-                                      {
-                                        staticClass:
-                                          "btn btn-primary d-print-none",
-                                        attrs: { type: "button" },
-                                        on: {
-                                          click: function($event) {
-                                            _vm.openModal(module)
-                                          }
-                                        }
-                                      },
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                    : _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  module.student_modules[0]
+                                    ? _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(
+                                            _vm._s(
+                                              module.student_modules[0]
+                                                .finish_date
+                                            )
+                                          )
+                                        ]),
+                                        _vm._v(" "),
+                                        module.student_modules[0].begin_date
+                                          ? _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _vm._v(
+                                                  "Geschatte einddatum: \r\n                " +
+                                                    _vm._s(
+                                                      module.student_modules[0]
+                                                        .expected_date
+                                                    ) +
+                                                    "\r\n              "
+                                                )
+                                              ]
+                                            )
+                                          : _c(
+                                              "div",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _c("p", [_vm._v(" ")]),
+                                                _vm._v(" "),
+                                                _c("p", [_vm._v(" ")])
+                                              ]
+                                            )
+                                      ])
+                                    : _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  !module.student_modules[0] ||
+                                  !module.student_modules[0].approved_by
+                                    ? _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c(
+                                          "button",
+                                          {
+                                            staticClass:
+                                              "btn btn-primary d-print-none",
+                                            attrs: { type: "button" },
+                                            on: {
+                                              click: function($event) {
+                                                _vm.openModal(module)
+                                              }
+                                            }
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\r\n                Accorderen\r\n              "
+                                            )
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                    : _c(
+                                        "div",
+                                        { staticClass: "card-body pt-2" },
+                                        [
+                                          module.student_modules[0].mark
+                                            ? _c("p", [
+                                                _vm._v(
+                                                  "\r\n                " +
+                                                    _vm._s(
+                                                      module.student_modules[0]
+                                                        .mark
+                                                    ) +
+                                                    "\r\n              "
+                                                )
+                                              ])
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          module.student_modules[0].approved_by
+                                            ? _c("p", [
+                                                _vm._v(
+                                                  "\r\n                ✓ " +
+                                                    _vm._s(
+                                                      module.student_modules[0]
+                                                        .approved_by
+                                                    ) +
+                                                    "\r\n              "
+                                                )
+                                              ])
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-primary d-print-none",
+                                              attrs: { type: "button" },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.openModal(module)
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                "\r\n                Accorderen\r\n              "
+                                              )
+                                            ]
+                                          )
+                                        ]
+                                      )
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                module.student_modules[0]
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "card text-center" },
                                       [
-                                        _vm._v(
-                                          "\r\n              Accorderen\r\n            "
+                                        !module.student_modules[0].pass
+                                          ? _c(
+                                              "div",
+                                              { staticClass: "card-body" },
+                                              [
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c("input", {
+                                                  directives: [
+                                                    {
+                                                      name: "model",
+                                                      rawName: "v-model",
+                                                      value:
+                                                        module
+                                                          .student_modules[0]
+                                                          .begin_date,
+                                                      expression:
+                                                        "module.student_modules[0].begin_date"
+                                                    }
+                                                  ],
+                                                  attrs: {
+                                                    disabled:
+                                                      _vm.submittedBegin,
+                                                    type: "checkbox",
+                                                    id: "checkbox"
+                                                  },
+                                                  domProps: {
+                                                    value: module.id,
+                                                    checked: Array.isArray(
+                                                      module.student_modules[0]
+                                                        .begin_date
+                                                    )
+                                                      ? _vm._i(
+                                                          module
+                                                            .student_modules[0]
+                                                            .begin_date,
+                                                          module.id
+                                                        ) > -1
+                                                      : module
+                                                          .student_modules[0]
+                                                          .begin_date
+                                                  },
+                                                  on: {
+                                                    click: function($event) {
+                                                      _vm.beganModule(
+                                                        module.id,
+                                                        !module
+                                                          .student_modules[0]
+                                                          .begin_date
+                                                      )
+                                                    },
+                                                    change: function($event) {
+                                                      var $$a =
+                                                          module
+                                                            .student_modules[0]
+                                                            .begin_date,
+                                                        $$el = $event.target,
+                                                        $$c = $$el.checked
+                                                          ? true
+                                                          : false
+                                                      if (Array.isArray($$a)) {
+                                                        var $$v = module.id,
+                                                          $$i = _vm._i($$a, $$v)
+                                                        if ($$el.checked) {
+                                                          $$i < 0 &&
+                                                            (module.student_modules[0].begin_date = $$a.concat(
+                                                              [$$v]
+                                                            ))
+                                                        } else {
+                                                          $$i > -1 &&
+                                                            (module.student_modules[0].begin_date = $$a
+                                                              .slice(0, $$i)
+                                                              .concat(
+                                                                $$a.slice(
+                                                                  $$i + 1
+                                                                )
+                                                              ))
+                                                        }
+                                                      } else {
+                                                        _vm.$set(
+                                                          module
+                                                            .student_modules[0],
+                                                          "begin_date",
+                                                          $$c
+                                                        )
+                                                      }
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "label",
+                                                  {
+                                                    attrs: { for: "checkbox" }
+                                                  },
+                                                  [_vm._v("Gestart?")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                )
+                                              ]
+                                            )
+                                          : module.student_modules[0].note
+                                            ? _c(
+                                                "div",
+                                                {
+                                                  staticClass: "card-body p-3"
+                                                },
+                                                [
+                                                  _c("textarea", {
+                                                    directives: [
+                                                      {
+                                                        name: "model",
+                                                        rawName: "v-model",
+                                                        value:
+                                                          module
+                                                            .student_modules[0]
+                                                            .note,
+                                                        expression:
+                                                          "module.student_modules[0].note"
+                                                      }
+                                                    ],
+                                                    staticClass: "form-control",
+                                                    attrs: {
+                                                      rows: "4",
+                                                      id: "comment",
+                                                      disabled: ""
+                                                    },
+                                                    domProps: {
+                                                      value:
+                                                        module
+                                                          .student_modules[0]
+                                                          .note
+                                                    },
+                                                    on: {
+                                                      input: function($event) {
+                                                        if (
+                                                          $event.target
+                                                            .composing
+                                                        ) {
+                                                          return
+                                                        }
+                                                        _vm.$set(
+                                                          module
+                                                            .student_modules[0],
+                                                          "note",
+                                                          $event.target.value
+                                                        )
+                                                      }
+                                                    }
+                                                  })
+                                                ]
+                                              )
+                                            : _c("div", [
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                )
+                                              ])
+                                      ]
+                                    )
+                                  : _c(
+                                      "div",
+                                      { staticClass: "card text-center" },
+                                      [
+                                        _c(
+                                          "div",
+                                          { staticClass: "card-body" },
+                                          [
+                                            _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [_vm._v(" ")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              attrs: {
+                                                disabled: _vm.submittedBegin,
+                                                type: "checkbox",
+                                                id: "checkbox"
+                                              },
+                                              domProps: { value: module.id },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.beganModule(
+                                                    module.id,
+                                                    true
+                                                  )
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c(
+                                              "label",
+                                              { attrs: { for: "checkbox" } },
+                                              [_vm._v("Gestart?")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [_vm._v(" ")]
+                                            )
+                                          ]
                                         )
                                       ]
                                     )
-                                  ])
-                                : _vm._e()
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-2 my-auto" }, [
-                          module.student_modules[0]
-                            ? _c("div", { staticClass: "card text-center" }, [
-                                !module.student_modules[0].pass
-                                  ? _c("div", { staticClass: "card-body" }, [
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value:
-                                              module.student_modules[0]
-                                                .begin_date,
-                                            expression:
-                                              "module.student_modules[0].begin_date"
-                                          }
-                                        ],
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                {
+                                  staticClass: "collapse col-12 pt-2",
+                                  attrs: {
+                                    id: "collapse" + module.id,
+                                    role: "tabpanel",
+                                    "aria-labelledby": "heading",
+                                    "data-parent": "#accordion"
+                                  }
+                                },
+                                [
+                                  _c(
+                                    "div",
+                                    { staticClass: "card card-body" },
+                                    [
+                                      _c("medium-editor", {
                                         attrs: {
-                                          type: "checkbox",
-                                          id: "checkbox"
-                                        },
-                                        domProps: {
-                                          value: module.id,
-                                          checked: Array.isArray(
-                                            module.student_modules[0].begin_date
-                                          )
-                                            ? _vm._i(
-                                                module.student_modules[0]
-                                                  .begin_date,
-                                                module.id
-                                              ) > -1
-                                            : module.student_modules[0]
-                                                .begin_date
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            _vm.beganModule(
-                                              module.id,
-                                              !module.student_modules[0]
-                                                .begin_date
-                                            )
-                                          },
-                                          change: function($event) {
-                                            var $$a =
-                                                module.student_modules[0]
-                                                  .begin_date,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = module.id,
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (module.student_modules[0].begin_date = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (module.student_modules[0].begin_date = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.$set(
-                                                module.student_modules[0],
-                                                "begin_date",
-                                                $$c
-                                              )
-                                            }
-                                          }
+                                          text: module.long_description,
+                                          options: _vm.options
                                         }
-                                      }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "label",
-                                        { attrs: { for: "checkbox" } },
-                                        [_vm._v("Gestart?")]
-                                      ),
-                                      _vm._v(" "),
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ])
-                                    ])
-                                  : module.student_modules[0].note
-                                    ? _c(
-                                        "div",
-                                        { staticClass: "card-body p-3" },
-                                        [
-                                          _c("textarea", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  module.student_modules[0]
-                                                    .note,
-                                                expression:
-                                                  "module.student_modules[0].note"
-                                              }
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              rows: "4",
-                                              id: "comment",
-                                              disabled: ""
-                                            },
-                                            domProps: {
-                                              value:
-                                                module.student_modules[0].note
-                                            },
-                                            on: {
-                                              input: function($event) {
-                                                if ($event.target.composing) {
-                                                  return
-                                                }
-                                                _vm.$set(
-                                                  module.student_modules[0],
-                                                  "note",
-                                                  $event.target.value
-                                                )
-                                              }
-                                            }
-                                          })
-                                        ]
-                                      )
-                                    : _c("div", [
-                                        _c("p", { staticClass: "card-text" }, [
-                                          _vm._v(" ")
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("p", { staticClass: "card-text" }, [
-                                          _vm._v(" ")
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("p", { staticClass: "card-text" }, [
-                                          _vm._v(" ")
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("p", { staticClass: "card-text" }, [
-                                          _vm._v(" ")
-                                        ])
-                                      ])
-                              ])
-                            : _c("div", { staticClass: "card text-center" }, [
-                                _c("div", { staticClass: "card-body" }, [
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    attrs: { type: "checkbox", id: "checkbox" },
-                                    domProps: { value: module.id },
-                                    on: {
-                                      click: function($event) {
-                                        _vm.beganModule(module.id, true)
-                                      }
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _c("label", { attrs: { for: "checkbox" } }, [
-                                    _vm._v("Gestart?")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("p", { staticClass: "card-text" }, [
-                                    _vm._v(" ")
-                                  ])
-                                ])
-                              ])
-                        ])
-                      ]
-                    )
-                  : _vm._e()
-              })
-            ],
-            2
-          )
-        : _c("div", { staticClass: "row" }, [
-            _c(
-              "div",
-              { staticClass: "col-md-4" },
-              [
-                _c("h4", [_vm._v("Opleiding voortgang")]),
-                _vm._v(" "),
-                _c("studentprogresschart", {
-                  staticClass: "h-25",
-                  attrs: { student: _vm.studentInfo }
-                })
-              ],
-              1
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "col" },
-              [
-                _c("h4", [_vm._v("Cijfers")]),
-                _vm._v(" "),
-                _c("studentchart", { attrs: { student: _vm.studentInfo } })
-              ],
-              1
-            )
-          ])
-    ],
-    1
-  )
+                                      })
+                                    ],
+                                    1
+                                  )
+                                ]
+                              )
+                            ]
+                          )
+                        : _vm._e()
+                    })
+                  ],
+                  2
+                )
+              : _c("div", { staticClass: "row" }, [
+                  _c(
+                    "div",
+                    { staticClass: "col-4" },
+                    [
+                      _c("h4", [_vm._v("Opleiding voortgang")]),
+                      _vm._v(" "),
+                      _c("studentprogresschart", {
+                        staticClass: "h-25",
+                        attrs: { student: _vm.studentInfo }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col" },
+                    [
+                      _c("h4", [_vm._v("Cijfers")]),
+                      _vm._v(" "),
+                      _c("studentchart", {
+                        attrs: { student: _vm.studentInfo }
+                      })
+                    ],
+                    1
+                  )
+                ])
+          ],
+          1
+        )
+  ])
 }
 var staticRenderFns = [
   function() {
@@ -95707,6 +95851,36 @@ var staticRenderFns = [
         _vm._v(
           "\r\n        Deze student bestaat waarschijnlijk niet (meer).\r\n      "
         )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Naam")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Duur")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Begindatum")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Einddatum")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Beoordeling")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v(" ")])
       ])
     ])
   }
@@ -95945,41 +96119,34 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_3_vee_validate__["a" /* default */]);
         this.selectedObjects = { id: this.student.cohort_id, name: this.student.cohort.name };
       }
     } else {
-      this.getStudent();
+      this.student = this.studentInfo;
     }
   },
   methods: {
-    getStudent: function getStudent() {
+    getCohorts: function getCohorts() {
       var _this = this;
 
-      axios.get("/api/student").then(function (res) {
-        _this.student = res.data;
-      });
-    },
-    getCohorts: function getCohorts() {
-      var _this2 = this;
-
       axios.get("/api/cohort").then(function (res) {
-        _this2.cohorts = res.data;
+        _this.cohorts = res.data;
       });
     },
     saveStudent: function saveStudent() {
-      var _this3 = this;
+      var _this2 = this;
 
       this.submitted = true;
       if (this.studentInfo !== undefined) {
         axios.put("/api/student/" + _.last(window.location.pathname.split("/")), {
-          studentNumber: this.student.student_id,
+          student_id: this.student.student_id,
           cohorts: this.selectedIds,
           firstName: this.student.first_name,
           prefix: this.student.prefix,
           lastName: this.student.last_name,
           date: this.student.started_on
         }).then(function (res) {
-          _this3.submitted = false;
+          _this2.submitted = false;
         }).catch(function (err) {
-          _this3.submitted = false;
-          _this3.error = err.response.data.errors;
+          _this2.submitted = false;
+          _this2.error = err.response.data.errors.studentNumber[0];
         });
       } else {
         axios.post("/api/student", {
@@ -95992,14 +96159,14 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_3_vee_validate__["a" /* default */]);
         }).then(function (res) {
           document.location.href = '../student';
         }).catch(function (err) {
-          _this3.submitted = false;
-          _this3.error = err.response.data.errors.studentNumber[0];
+          _this2.submitted = false;
+          _this2.error = err.response.data.errors.studentNumber[0];
         });
       }
     },
     //check if user is sure to delete the student (confirm can be without the window prefix)
     deleteStudent: function deleteStudent() {
-      var _this4 = this;
+      var _this3 = this;
 
       if (confirm("Weet je zeker dat je de student wilt verwijderen? (student wordt gearchiveerd)")) {
         this.submitted = true;
@@ -96013,20 +96180,20 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_3_vee_validate__["a" /* default */]);
         }).then(function (res) {
           document.location.href = '../student';
         }).catch(function (err) {
-          _this4.submitted = false;
-          _this4.error = err.response.data.errors;
+          _this3.submitted = false;
+          _this3.error = err.response.data.errors;
         });
       }
     },
     validateForm: function validateForm() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.$validator.validateAll().then(function (result) {
         if (result) {
-          _this5.saveStudent();
+          _this4.saveStudent();
           return;
         }
-        _this5.error = "Je bent vergeten om iets in te vullen.";
+        _this4.error = "Je hebt iets incorrect ingevuld.";
       });
     },
     print: function print() {
@@ -96054,14 +96221,16 @@ var render = function() {
       }
     },
     [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary float-right d-print-none",
-          on: { click: _vm.print }
-        },
-        [_vm._v("Uitprinten")]
-      ),
+      _vm.studentInfo !== undefined
+        ? _c(
+            "button",
+            {
+              staticClass: "btn btn-primary float-right d-print-none",
+              on: { click: _vm.print }
+            },
+            [_vm._v("Uitprinten")]
+          )
+        : _vm._e(),
       _vm._v(" "),
       _c("fieldset", { attrs: { disabled: _vm.isStudent } }, [
         _vm.error
@@ -96086,8 +96255,8 @@ var render = function() {
                 {
                   name: "validate",
                   rawName: "v-validate",
-                  value: "required",
-                  expression: "'required'"
+                  value: "required|max:20",
+                  expression: "'required|max:20'"
                 },
                 {
                   name: "model",
@@ -96135,8 +96304,8 @@ var render = function() {
                 {
                   name: "validate",
                   rawName: "v-validate",
-                  value: "required",
-                  expression: "'required'"
+                  value: "required|max:40",
+                  expression: "'required|max:40'"
                 },
                 {
                   name: "model",
@@ -96145,7 +96314,6 @@ var render = function() {
                   expression: "student.first_name"
                 }
               ],
-              staticClass: "form-control",
               class: {
                 input: true,
                 "form-control": true,
@@ -96183,14 +96351,24 @@ var render = function() {
             _c("input", {
               directives: [
                 {
+                  name: "validate",
+                  rawName: "v-validate",
+                  value: "max:40",
+                  expression: "'max:40'"
+                },
+                {
                   name: "model",
                   rawName: "v-model",
                   value: _vm.student.prefix,
                   expression: "student.prefix"
                 }
               ],
-              staticClass: "form-control",
-              attrs: { type: "text" },
+              class: {
+                input: true,
+                "form-control": true,
+                invalid: _vm.errors.has("prefix")
+              },
+              attrs: { name: "prefix", type: "text" },
               domProps: { value: _vm.student.prefix },
               on: {
                 input: function($event) {
@@ -96220,8 +96398,8 @@ var render = function() {
                 {
                   name: "validate",
                   rawName: "v-validate",
-                  value: "required",
-                  expression: "'required'"
+                  value: "required|max:40",
+                  expression: "'required|max:40'"
                 },
                 {
                   name: "model",
@@ -96413,7 +96591,7 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          !_vm.isStudent
+          !_vm.isStudent && _vm.studentInfo !== undefined
             ? _c(
                 "button",
                 {
@@ -97029,6 +97207,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -97041,7 +97243,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       error: false,
       checked: false,
       options: { disableEditing: true, toolbar: false, placeholder: false },
-      showModules: true
+      showModules: true,
+      student: {
+        cohorts: [{ id: "", name: "" }],
+        student_id: "",
+        firstName: "",
+        prefix: "",
+        lastName: "",
+        date: null
+      },
+      submittedBegin: false
     };
   },
   components: {
@@ -97049,24 +97260,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     studentchart: __WEBPACK_IMPORTED_MODULE_1__StudentChart___default.a
   },
   created: function created() {
+    this.getStudent();
     this.getModules();
   },
   methods: {
     getModules: function getModules() {
       var _this = this;
 
-      axios.get("/api/student/studentmodule").then(function (res) {
+      axios.get("/api/student").then(function (res) {
         _this.moduleList = res.data;
-        _this.moduleList[0].modules = _.orderBy(_this.moduleList[0].modules, 'student_modules[0]', 'asc');
+        _this.submittedBegin = false;
+        //sort by approved modules, after that by a started module
+        _this.moduleList[0].modules = _.sortBy(_this.moduleList[0].modules, [function (module) {
+          return module.student_modules[0].approved_by;
+        }, function (module) {
+          return module.student_modules[0].begin_date;
+        }]);
       }).catch(function (err) {
         _this.error = true;
       });
     },
-    beganModule: function beganModule(moduleID, toggle) {
+    getStudent: function getStudent() {
       var _this2 = this;
 
+      axios.get("/api/student/own").then(function (res) {
+        _this2.student = res.data;
+      });
+    },
+    beganModule: function beganModule(moduleID, toggle) {
+      var _this3 = this;
+
+      this.submittedBegin = true;
       axios.put("/api/studentmodule/" + moduleID + "/toggle", { began: toggle }).then(function (res) {
-        return _this2.getModules();
+        _this3.getModules();
       });
     }
   }
@@ -97080,111 +97306,549 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "container" },
-    [
-      _vm.error
-        ? _c(
-            "div",
-            { staticClass: "modal-dialog", attrs: { role: "document" } },
-            [_vm._m(0)]
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      _c("studentform", {
-        attrs: { studentInfo: _vm.moduleList, isStudent: true }
-      }),
-      _vm._v(" "),
-      _c("hr"),
-      _vm._v(" "),
-      _c("div", { staticClass: "text-center mb-5 d-print-none" }, [
-        _c(
-          "a",
-          {
-            staticClass: "btn btn-primary btn-lg active",
-            attrs: { role: "button", "aria-pressed": "true" },
-            on: {
-              click: function($event) {
-                _vm.showModules = true
-              }
-            }
-          },
-          [_vm._v("Modules")]
-        ),
-        _vm._v(" "),
-        _c(
-          "a",
-          {
-            staticClass: "btn btn-primary btn-lg active",
-            attrs: { role: "button", "aria-pressed": "true" },
-            on: {
-              click: function($event) {
-                _vm.showModules = false
-              }
-            }
-          },
-          [_vm._v("Statistieken")]
+  return _c("div", { staticClass: "container" }, [
+    _vm.error
+      ? _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [_vm._m(0)]
         )
-      ]),
-      _vm._v(" "),
-      _vm.showModules
-        ? _c(
-            "div",
-            _vm._l(_vm.moduleList[0].modules, function(module, index) {
-              return _vm.moduleList[0]
-                ? _c(
-                    "div",
-                    {
-                      key: module.id,
-                      staticClass: "row pt-3 pb-3",
-                      staticStyle: { "border-bottom": "1px solid #ccc" }
-                    },
-                    [
-                      _c("div", { staticClass: "col-2 my-auto" }, [
-                        index == 0
-                          ? _c("h4", { staticClass: "text-center" }, [
-                              _vm._v("Naam")
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "card bg-light" }, [
-                          _c(
-                            "div",
-                            { staticClass: "card-header text-center p-2" },
-                            [_vm._v(_vm._s(module.name))]
-                          ),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "card-body p-2" }, [
-                            _c("p", { staticClass: "card-text text-center" }, [
-                              _vm._v(_vm._s(module.sub_description))
-                            ])
-                          ]),
-                          _vm._v(" "),
-                          _c(
+      : _c(
+          "span",
+          [
+            _c("studentform", {
+              attrs: { studentInfo: _vm.student, isStudent: true }
+            }),
+            _vm._v(" "),
+            _c("hr"),
+            _vm._v(" "),
+            _c("div", { staticClass: "text-center mb-5 d-print-none" }, [
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-primary btn-lg active",
+                  attrs: { role: "button", "aria-pressed": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.showModules = true
+                    }
+                  }
+                },
+                [_vm._v("Modules")]
+              ),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-primary btn-lg active",
+                  attrs: { role: "button", "aria-pressed": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.showModules = false
+                    }
+                  }
+                },
+                [_vm._v("Statistieken")]
+              )
+            ]),
+            _vm._v(" "),
+            _vm.showModules
+              ? _c(
+                  "div",
+                  [
+                    _vm._m(1),
+                    _vm._v(" "),
+                    _vm._l(_vm.moduleList[0].modules, function(module) {
+                      return _vm.moduleList[0]
+                        ? _c(
                             "div",
                             {
-                              staticClass:
-                                "card-footer bg-transparent border-success"
+                              key: module.id,
+                              staticClass: "row pt-3 pb-3",
+                              staticStyle: { "border-bottom": "1px solid #ccc" }
                             },
                             [
-                              _c(
-                                "a",
-                                {
-                                  attrs: {
-                                    "data-toggle": "collapse",
-                                    href: "#collapse" + module.id,
-                                    "aria-expanded": "true",
-                                    "aria-controls": "collapse" + module.id
-                                  }
-                                },
-                                [_vm._v("\n              Uitleg\n            ")]
-                              ),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card bg-light" }, [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "card-header text-center p-2"
+                                    },
+                                    [_vm._v(_vm._s(module.name))]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "card-body p-2" }, [
+                                    _c(
+                                      "p",
+                                      { staticClass: "card-text text-center" },
+                                      [_vm._v(_vm._s(module.sub_description))]
+                                    )
+                                  ]),
+                                  _vm._v(" "),
+                                  module.long_description
+                                    ? _c(
+                                        "div",
+                                        {
+                                          staticClass:
+                                            "card-footer bg-transparent border-success"
+                                        },
+                                        [
+                                          _c(
+                                            "a",
+                                            {
+                                              attrs: {
+                                                "data-toggle": "collapse",
+                                                href: "#collapse" + module.id,
+                                                "aria-expanded": "true",
+                                                "aria-controls":
+                                                  "collapse" + module.id
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                "\n                Uitleg\n              "
+                                              )
+                                            ]
+                                          )
+                                        ]
+                                      )
+                                    : _vm._e()
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  _c("div", { staticClass: "card-body" }, [
+                                    _c("p", { staticClass: "card-text" }, [
+                                      _vm._v(
+                                        _vm._s(module.week_duration / 8) +
+                                          " periode"
+                                      )
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("p", { staticClass: "card-text" }, [
+                                      _vm._v("=")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("p", { staticClass: "card-text" }, [
+                                      _vm._v(
+                                        _vm._s(module.week_duration) + " weken"
+                                      )
+                                    ])
+                                  ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  module.student_modules[0] &&
+                                  module.student_modules[0].begin_date
+                                    ? _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        module.student_modules[0].begin_date !=
+                                        true
+                                          ? _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    module.student_modules[0]
+                                                      .begin_date
+                                                  )
+                                                )
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                    : _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  module.student_modules[0]
+                                    ? _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(
+                                            _vm._s(
+                                              module.student_modules[0]
+                                                .finish_date
+                                            )
+                                          )
+                                        ]),
+                                        _vm._v(" "),
+                                        module.student_modules[0].begin_date
+                                          ? _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _vm._v(
+                                                  "Geschatte einddatum: \n                " +
+                                                    _vm._s(
+                                                      module.student_modules[0]
+                                                        .expected_date
+                                                    ) +
+                                                    "\n              "
+                                                )
+                                              ]
+                                            )
+                                          : _c(
+                                              "div",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _c("p", [_vm._v(" ")]),
+                                                _vm._v(" "),
+                                                _c("p", [_vm._v(" ")])
+                                              ]
+                                            )
+                                      ])
+                                    : _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                _c("div", { staticClass: "card text-center" }, [
+                                  module.student_modules[0]
+                                    ? _c(
+                                        "div",
+                                        { staticClass: "card-body pt-2" },
+                                        [
+                                          module.student_modules[0].teacher
+                                            ? _c("p", [
+                                                _vm._v(
+                                                  "\n                ✓ " +
+                                                    _vm._s(
+                                                      module.student_modules[0]
+                                                        .teacher
+                                                    ) +
+                                                    "\n              "
+                                                )
+                                              ])
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          module.student_modules[0].mark
+                                            ? _c("p", [
+                                                _vm._v(
+                                                  "\n                " +
+                                                    _vm._s(
+                                                      module.student_modules[0]
+                                                        .mark
+                                                    ) +
+                                                    "\n              "
+                                                )
+                                              ])
+                                            : _c(
+                                                "div",
+                                                { staticClass: "card-body" },
+                                                [
+                                                  _c(
+                                                    "p",
+                                                    {
+                                                      staticClass: "card-text"
+                                                    },
+                                                    [_vm._v(" ")]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _c(
+                                                    "p",
+                                                    {
+                                                      staticClass: "card-text"
+                                                    },
+                                                    [_vm._v(" ")]
+                                                  )
+                                                ]
+                                              )
+                                        ]
+                                      )
+                                    : _c("div", { staticClass: "card-body" }, [
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", { staticClass: "card-text" }, [
+                                          _vm._v(" ")
+                                        ])
+                                      ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-2 my-auto" }, [
+                                module.student_modules[0]
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "card text-center" },
+                                      [
+                                        !module.student_modules[0].approved_by
+                                          ? _c(
+                                              "div",
+                                              { staticClass: "card-body" },
+                                              [
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c("input", {
+                                                  directives: [
+                                                    {
+                                                      name: "model",
+                                                      rawName: "v-model",
+                                                      value:
+                                                        module
+                                                          .student_modules[0]
+                                                          .begin_date,
+                                                      expression:
+                                                        "module.student_modules[0].begin_date"
+                                                    }
+                                                  ],
+                                                  attrs: {
+                                                    disabled:
+                                                      _vm.submittedBegin,
+                                                    type: "checkbox",
+                                                    id: "checkbox"
+                                                  },
+                                                  domProps: {
+                                                    value: module.id,
+                                                    checked: Array.isArray(
+                                                      module.student_modules[0]
+                                                        .begin_date
+                                                    )
+                                                      ? _vm._i(
+                                                          module
+                                                            .student_modules[0]
+                                                            .begin_date,
+                                                          module.id
+                                                        ) > -1
+                                                      : module
+                                                          .student_modules[0]
+                                                          .begin_date
+                                                  },
+                                                  on: {
+                                                    click: function($event) {
+                                                      _vm.beganModule(
+                                                        module.id,
+                                                        !module
+                                                          .student_modules[0]
+                                                          .begin_date
+                                                      )
+                                                    },
+                                                    change: function($event) {
+                                                      var $$a =
+                                                          module
+                                                            .student_modules[0]
+                                                            .begin_date,
+                                                        $$el = $event.target,
+                                                        $$c = $$el.checked
+                                                          ? true
+                                                          : false
+                                                      if (Array.isArray($$a)) {
+                                                        var $$v = module.id,
+                                                          $$i = _vm._i($$a, $$v)
+                                                        if ($$el.checked) {
+                                                          $$i < 0 &&
+                                                            (module.student_modules[0].begin_date = $$a.concat(
+                                                              [$$v]
+                                                            ))
+                                                        } else {
+                                                          $$i > -1 &&
+                                                            (module.student_modules[0].begin_date = $$a
+                                                              .slice(0, $$i)
+                                                              .concat(
+                                                                $$a.slice(
+                                                                  $$i + 1
+                                                                )
+                                                              ))
+                                                        }
+                                                      } else {
+                                                        _vm.$set(
+                                                          module
+                                                            .student_modules[0],
+                                                          "begin_date",
+                                                          $$c
+                                                        )
+                                                      }
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "label",
+                                                  {
+                                                    attrs: { for: "checkbox" }
+                                                  },
+                                                  [_vm._v("Gestart?")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                )
+                                              ]
+                                            )
+                                          : module.student_modules[0].note
+                                            ? _c(
+                                                "div",
+                                                {
+                                                  staticClass: "card-body p-3"
+                                                },
+                                                [
+                                                  _c("textarea", {
+                                                    directives: [
+                                                      {
+                                                        name: "model",
+                                                        rawName: "v-model",
+                                                        value:
+                                                          module
+                                                            .student_modules[0]
+                                                            .note,
+                                                        expression:
+                                                          "module.student_modules[0].note"
+                                                      }
+                                                    ],
+                                                    staticClass: "form-control",
+                                                    attrs: {
+                                                      rows: "4",
+                                                      id: "comment",
+                                                      disabled: ""
+                                                    },
+                                                    domProps: {
+                                                      value:
+                                                        module
+                                                          .student_modules[0]
+                                                          .note
+                                                    },
+                                                    on: {
+                                                      input: function($event) {
+                                                        if (
+                                                          $event.target
+                                                            .composing
+                                                        ) {
+                                                          return
+                                                        }
+                                                        _vm.$set(
+                                                          module
+                                                            .student_modules[0],
+                                                          "note",
+                                                          $event.target.value
+                                                        )
+                                                      }
+                                                    }
+                                                  })
+                                                ]
+                                              )
+                                            : _c("div", [
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "p",
+                                                  { staticClass: "card-text" },
+                                                  [_vm._v(" ")]
+                                                )
+                                              ])
+                                      ]
+                                    )
+                                  : _c(
+                                      "div",
+                                      { staticClass: "card text-center" },
+                                      [
+                                        _c(
+                                          "div",
+                                          { staticClass: "card-body" },
+                                          [
+                                            _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [_vm._v(" ")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              attrs: {
+                                                type: "checkbox",
+                                                id: "checkbox"
+                                              },
+                                              domProps: { value: module.id },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.beganModule(
+                                                    module.id,
+                                                    true
+                                                  )
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c(
+                                              "label",
+                                              { attrs: { for: "checkbox" } },
+                                              [_vm._v("Gestart?")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [_vm._v(" ")]
+                                            )
+                                          ]
+                                        )
+                                      ]
+                                    )
+                              ]),
                               _vm._v(" "),
                               _c(
                                 "div",
                                 {
-                                  staticClass: "collapse",
+                                  staticClass: "collapse col-12 pt-2",
                                   attrs: {
                                     id: "collapse" + module.id,
                                     role: "tabpanel",
@@ -97195,7 +97859,7 @@ var render = function() {
                                 [
                                   _c(
                                     "div",
-                                    { staticClass: "card-body p-0" },
+                                    { staticClass: "card card-body" },
                                     [
                                       _c("medium-editor", {
                                         attrs: {
@@ -97210,369 +97874,43 @@ var render = function() {
                               )
                             ]
                           )
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-2 my-auto" }, [
-                        index == 0
-                          ? _c("h4", { staticClass: "text-center" }, [
-                              _vm._v("Duur")
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "card text-center" }, [
-                          _c("div", { staticClass: "card-body" }, [
-                            _c("p", { staticClass: "card-text" }, [
-                              _vm._v(
-                                _vm._s(module.week_duration / 8) + " periode"
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("p", { staticClass: "card-text" }, [
-                              _vm._v("=")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", { staticClass: "card-text" }, [
-                              _vm._v(_vm._s(module.week_duration) + " weken")
-                            ])
-                          ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-2 my-auto" }, [
-                        index == 0
-                          ? _c("h4", { staticClass: "text-center" }, [
-                              _vm._v("Begindatum")
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "card text-center" }, [
-                          module.student_modules[0] &&
-                          module.student_modules[0].begin_date
-                            ? _c("div", { staticClass: "card-body" }, [
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(
-                                    _vm._s(module.student_modules[0].begin_date)
-                                  )
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ])
-                              ])
-                            : _c("div", { staticClass: "card-body" }, [
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ])
-                              ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-2 my-auto" }, [
-                        index == 0
-                          ? _c("h4", { staticClass: "text-center" }, [
-                              _vm._v("Einddatum")
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "card text-center" }, [
-                          module.student_modules[0]
-                            ? _c("div", { staticClass: "card-body" }, [
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(
-                                    _vm._s(
-                                      module.student_modules[0].finish_date
-                                    )
-                                  )
-                                ]),
-                                _vm._v(" "),
-                                module.student_modules[0].begin_date
-                                  ? _c("p", { staticClass: "card-text" }, [
-                                      _vm._v(
-                                        "Geschatte einddatum: \n              " +
-                                          _vm._s(
-                                            module.student_modules[0]
-                                              .expected_date
-                                          ) +
-                                          "\n            "
-                                      )
-                                    ])
-                                  : _c("div", { staticClass: "card-text" }, [
-                                      _c("p", [_vm._v(" ")]),
-                                      _vm._v(" "),
-                                      _c("p", [_vm._v(" ")])
-                                    ])
-                              ])
-                            : _c("div", { staticClass: "card-body" }, [
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ])
-                              ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-2 my-auto" }, [
-                        index == 0
-                          ? _c("h4", { staticClass: "text-center" }, [
-                              _vm._v("Beoordeling")
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "card text-center" }, [
-                          module.student_modules[0]
-                            ? _c("div", { staticClass: "card-body pt-2" }, [
-                                module.student_modules[0].teacher
-                                  ? _c("p", [
-                                      _vm._v(
-                                        "\n              ✓ " +
-                                          _vm._s(
-                                            module.student_modules[0].teacher
-                                          ) +
-                                          "\n            "
-                                      )
-                                    ])
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                module.student_modules[0].mark
-                                  ? _c("p", [
-                                      _vm._v(
-                                        "\n              " +
-                                          _vm._s(
-                                            module.student_modules[0].mark
-                                          ) +
-                                          "\n            "
-                                      )
-                                    ])
-                                  : _c("div", { staticClass: "card-body" }, [
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ])
-                                    ])
-                              ])
-                            : _c("div", { staticClass: "card-body" }, [
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ])
-                              ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-2 my-auto" }, [
-                        module.student_modules[0]
-                          ? _c("div", { staticClass: "card text-center" }, [
-                              !module.student_modules[0].pass
-                                ? _c("div", { staticClass: "card-body" }, [
-                                    _c("p", { staticClass: "card-text" }, [
-                                      _vm._v(" ")
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value:
-                                            module.student_modules[0]
-                                              .begin_date,
-                                          expression:
-                                            "module.student_modules[0].begin_date"
-                                        }
-                                      ],
-                                      attrs: {
-                                        type: "checkbox",
-                                        id: "checkbox"
-                                      },
-                                      domProps: {
-                                        value: module.id,
-                                        checked: Array.isArray(
-                                          module.student_modules[0].begin_date
-                                        )
-                                          ? _vm._i(
-                                              module.student_modules[0]
-                                                .begin_date,
-                                              module.id
-                                            ) > -1
-                                          : module.student_modules[0].begin_date
-                                      },
-                                      on: {
-                                        click: function($event) {
-                                          _vm.beganModule(
-                                            module.id,
-                                            !module.student_modules[0]
-                                              .begin_date
-                                          )
-                                        },
-                                        change: function($event) {
-                                          var $$a =
-                                              module.student_modules[0]
-                                                .begin_date,
-                                            $$el = $event.target,
-                                            $$c = $$el.checked ? true : false
-                                          if (Array.isArray($$a)) {
-                                            var $$v = module.id,
-                                              $$i = _vm._i($$a, $$v)
-                                            if ($$el.checked) {
-                                              $$i < 0 &&
-                                                (module.student_modules[0].begin_date = $$a.concat(
-                                                  [$$v]
-                                                ))
-                                            } else {
-                                              $$i > -1 &&
-                                                (module.student_modules[0].begin_date = $$a
-                                                  .slice(0, $$i)
-                                                  .concat($$a.slice($$i + 1)))
-                                            }
-                                          } else {
-                                            _vm.$set(
-                                              module.student_modules[0],
-                                              "begin_date",
-                                              $$c
-                                            )
-                                          }
-                                        }
-                                      }
-                                    }),
-                                    _vm._v(" "),
-                                    _c(
-                                      "label",
-                                      { attrs: { for: "checkbox" } },
-                                      [_vm._v("Gestart?")]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("p", { staticClass: "card-text" }, [
-                                      _vm._v(" ")
-                                    ])
-                                  ])
-                                : module.student_modules[0].note
-                                  ? _c(
-                                      "div",
-                                      { staticClass: "card-body p-3" },
-                                      [
-                                        _c("textarea", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value:
-                                                module.student_modules[0].note,
-                                              expression:
-                                                "module.student_modules[0].note"
-                                            }
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: {
-                                            rows: "4",
-                                            id: "comment",
-                                            disabled: ""
-                                          },
-                                          domProps: {
-                                            value:
-                                              module.student_modules[0].note
-                                          },
-                                          on: {
-                                            input: function($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.$set(
-                                                module.student_modules[0],
-                                                "note",
-                                                $event.target.value
-                                              )
-                                            }
-                                          }
-                                        })
-                                      ]
-                                    )
-                                  : _c("div", [
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("p", { staticClass: "card-text" }, [
-                                        _vm._v(" ")
-                                      ])
-                                    ])
-                            ])
-                          : _c("div", { staticClass: "card text-center" }, [
-                              _c("div", { staticClass: "card-body" }, [
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ]),
-                                _vm._v(" "),
-                                _c("input", {
-                                  attrs: { type: "checkbox", id: "checkbox" },
-                                  domProps: { value: module.id },
-                                  on: {
-                                    click: function($event) {
-                                      _vm.beganModule(module.id, true)
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("label", { attrs: { for: "checkbox" } }, [
-                                  _vm._v("Gestart?")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", { staticClass: "card-text" }, [
-                                  _vm._v(" ")
-                                ])
-                              ])
-                            ])
-                      ])
-                    ]
-                  )
-                : _c(
+                        : _vm._e()
+                    })
+                  ],
+                  2
+                )
+              : _c("div", { staticClass: "row" }, [
+                  _c(
                     "div",
+                    { staticClass: "col-4" },
                     [
+                      _c("h4", [_vm._v("Opleiding voortgang")]),
+                      _vm._v(" "),
+                      _c("studentprogresschart", {
+                        staticClass: "h-25",
+                        attrs: { student: _vm.student }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col" },
+                    [
+                      _c("h4", [_vm._v("Cijfers")]),
+                      _vm._v(" "),
                       _c("studentchart", {
-                        attrs: { student: _vm.moduleList, isStudent: true }
+                        attrs: { student: _vm.student, isStudent: true }
                       })
                     ],
                     1
                   )
-            })
-          )
-        : _vm._e()
-    ],
-    1
-  )
+                ])
+          ],
+          1
+        )
+  ])
 }
 var staticRenderFns = [
   function() {
@@ -97588,6 +97926,36 @@ var staticRenderFns = [
         _vm._v(
           "\n        Je hebt waarschijnlijk nog geen account hier.\n        Neem contact op met je studieloopbaanbegeleider\n      "
         )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Naam")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Duur")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Begindatum")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Einddatum")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v("Beoordeling")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 my-auto" }, [
+        _c("h4", { staticClass: "text-center" }, [_vm._v(" ")])
       ])
     ])
   }
@@ -97803,6 +98171,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -97837,43 +98208,50 @@ var render = function() {
   return _c(
     "div",
     { staticClass: "container" },
-    _vm._l(_vm.students, function(student) {
-      return student
-        ? _c(
-            "div",
-            {
-              key: student.id,
-              staticClass: "list-group mt-3 text-center col-sm"
-            },
-            [
-              _c(
-                "a",
-                {
-                  staticClass: "list-group-item list-group-item-action",
-                  attrs: { href: "/student/" + student.id }
-                },
-                [
-                  _vm._v(
-                    "\n          " +
-                      _vm._s(student.student_id) +
-                      " - " +
-                      _vm._s(student.first_name) +
-                      " " +
-                      _vm._s(student.prefix) +
-                      " " +
-                      _vm._s(student.last_name) +
-                      " - \n          " +
-                      _vm._s(student.cohort.name) +
-                      " - " +
-                      _vm._s(student.progress.toFixed(0)) +
-                      "%\n        "
-                  )
-                ]
-              )
-            ]
-          )
+    [
+      _vm._l(_vm.students, function(student) {
+        return student
+          ? _c(
+              "div",
+              {
+                key: student.id,
+                staticClass: "list-group mt-3 text-center col-sm"
+              },
+              [
+                _c(
+                  "a",
+                  {
+                    staticClass: "list-group-item list-group-item-action",
+                    attrs: { href: "/student/" + student.id }
+                  },
+                  [
+                    _vm._v(
+                      "\n      " +
+                        _vm._s(student.student_id) +
+                        " - " +
+                        _vm._s(student.first_name) +
+                        " " +
+                        _vm._s(student.prefix) +
+                        " " +
+                        _vm._s(student.last_name) +
+                        " - \n      " +
+                        _vm._s(student.cohort.name) +
+                        " - " +
+                        _vm._s(student.progress.toFixed(0)) +
+                        "%\n    "
+                    )
+                  ]
+                )
+              ]
+            )
+          : _vm._e()
+      }),
+      _vm._v(" "),
+      !Array.isArray(_vm.students) || !_vm.students.length
+        ? _c("div", [_c("p", [_vm._v("Er geen student gevonden")])])
         : _vm._e()
-    })
+    ],
+    2
   )
 }
 var staticRenderFns = []
@@ -97891,6 +98269,37 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 287 */,
+/* 288 */
+/***/ (function(module, exports) {
+
+module.exports = function(originalModule) {
+	if(!originalModule.webpackPolyfill) {
+		var module = Object.create(originalModule);
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		Object.defineProperty(module, "exports", {
+			enumerable: true,
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
 
 /***/ })
 /******/ ]);

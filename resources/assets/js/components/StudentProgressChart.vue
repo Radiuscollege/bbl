@@ -11,7 +11,6 @@ export default {
   props: ["student"],
   created: function() {},
   mounted: function() {
-    console.log(this.student);
     this.datacollection = {
       datacollection: {
         datasets: [

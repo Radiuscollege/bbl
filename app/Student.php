@@ -22,15 +22,35 @@ class Student extends Model
 
     protected $appends = ['progress', 'estimated_progress'];
 
+    //Get progress by checking how many weeks have been approved
+    //divided by how many weeks there are
     public function getProgressAttribute()
     {
-        return $this->studentModules->where('approved_by', '!=', null)->count() / $this->cohort->modules->count() * 100;
+        if ($this->cohort->modules->isNotEmpty() && $this->studentModules->isNotEmpty()) {
+            $avg = [];
+            foreach ($this->studentModules as $studentModule) {
+                if ($studentModule->approved_by != null) {
+                    array_push($avg, $studentModule->module->week_duration);
+                }
+            }
+            return (array_sum($avg) / $this->cohort->modules->sum('week_duration')) * 100;
+        } else {
+            return 0;
+        }
     }
-
+    
+    //Calculate estimated progress by looking at how many weeks the student is in
+    //divided by the amount it actually takes
     public function getEstimatedProgressAttribute()
     {
-        $started_date = new Carbon($this->attributes['started_on']);
-        return $this->cohort->modules->sum('week_duration') / $started_date->diffInWeeks(Carbon::today()) * 100;
+        if ($this->studentModules()->exists()) {
+            $startedOn = new Carbon($this->attributes['started_on']);
+            $lastDate = new Carbon($this->studentModules()->latest('finish_date')->first()->finish_date);
+            
+            return $startedOn->diffInWeeks($lastDate) / $this->cohort->modules->sum('week_duration') * 100;
+        } else {
+            return 0;
+        }
     }
     
     public function studentModules()

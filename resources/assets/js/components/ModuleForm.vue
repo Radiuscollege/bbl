@@ -6,13 +6,13 @@
     <div class="form-group row">
       <label for="inputName" class="col-sm-2 col-form-label">Naam</label>
       <div class="col-sm-5">
-        <input v-validate="'required'" :class="{'input': true, 'form-control': true, 'invalid': errors.has('name') }" v-model="module.name" name="name" type="text" placeholder="Naam">
+        <input v-validate="'required|max:40'" :class="{'input': true, 'form-control': true, 'invalid': errors.has('name') }" v-model="module.name" name="name" type="text" placeholder="Naam">
       </div>
     </div>
     <div class="form-group row">
       <label for="inputSubDescription" class="col-sm-2 col-form-label">Sub beschrijving</label>
       <div class="col-sm-5">
-        <input class="form-control" v-model="module.sub_description" type="text" placeholder="Sub beschrijving">
+        <input v-validate="'max:140'" name="subDescription" :class="{'input': true, 'form-control': true, 'invalid': errors.has('subDescription') }" v-model="module.sub_description" type="text" placeholder="Sub beschrijving">
       </div>
     </div>
     <div class="form-group row">
@@ -71,7 +71,8 @@ export default {
       options: { placeholder: { text: "Voeg hier een beschrijving toe" } },
       submitted: false,
       error: "",
-      attachment: { name: null, file: null }
+      attachment: { name: null, file: null },
+      text: ""
     };
   },
   watch: {
@@ -89,7 +90,7 @@ export default {
   },
   methods: {
     processEditOperation: function(operation) {
-      this.text = operation.api.origElements.innerHTML;
+      this.module.long_description = operation.api.origElements.innerHTML;
     },
     getCohorts: function() {
       axios.get("/api/cohort").then(res => {
@@ -104,6 +105,7 @@ export default {
           .get("/api/module/" + _.last(window.location.pathname.split("/")))
           .then(res => {
             this.module = res.data;
+            this.text = module.long_description;
             this.selectedObjects = [];
             //this.module.cohorts.forEach(function(element) {
             //  this.selectedObjects.push({id: element.pivot.cohort_id, name: element.name})
@@ -126,7 +128,7 @@ export default {
             subDescription: this.module.sub_description,
             weekDuration: this.module.week_duration,
             cohorts: this.selectedIds,
-            longDescription: this.text
+            longDescription: this.module.long_description
           })
           .then(res => {
             document.location.href = "../module";
@@ -142,14 +144,13 @@ export default {
             subDescription: this.module.sub_description,
             weekDuration: this.module.week_duration,
             cohorts: this.selectedIds,
-            longDescription: this.text
+            longDescription: this.module.long_description
           })
           .then(res => {
             document.location.href = "../module";
           })
           .catch(err => {
             this.submitted = false;
-            console.log(err);
             this.error = err.response.data.errors.name[0];
           });
       }
@@ -160,9 +161,9 @@ export default {
           this.saveModule();
           return;
         }
-        this.error = "Je bent vergeten om iets in te vullen.";
+        this.error = "Je hebt iets incorrect ingevuld.";
       });
-    },
+    }/*
     onFileChange(e) {
       console.log("FILECHANGE");
       this.attachment.file = e.target.files || e.dataTransfer.files;
@@ -176,7 +177,7 @@ export default {
             headers: { "Content-Type": "multipart/form-data" }
           })
       );
-    }
+    }*/
   }
 };
 </script>
