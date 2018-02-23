@@ -51,7 +51,7 @@
           <datepicker v-validate="'required'" :input-class="{'invalid': errors.has('date') }" v-model="student.started_on" :format="format" name="date"></datepicker>
         </div>
       </div>
-      <div v-if="student.progress" class="form-group row">
+      <div v-if="student.progress !== undefined" class="form-group row">
         <label for="inputPrefix" class="col-sm-2 col-form-label">Geslaagd</label>
         <div class="col-sm-5 my-auto">
           <span v-if="student.progress == 100" class="fa-layers fa-fw">
@@ -144,10 +144,15 @@ export default {
         })
         .then(res => {
           this.submitted = false;
+          this.error = "";
         })
         .catch(err => {
           this.submitted = false;
-          this.error = err.response.data.errors.studentNumber[0];
+          if (err.response.data.errors === undefined) {
+            this.error = err.response.data;
+          } else {
+            this.error = err.response.data.errors.studentNumber[0];
+          }
         })
       }
       else {
@@ -162,6 +167,7 @@ export default {
         })
         .then(res => {
           document.location.href = '../student';
+          this.error = "";
         })
         .catch(err => {
           this.submitted = false;

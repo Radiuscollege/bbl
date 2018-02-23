@@ -7,7 +7,7 @@
       </option>
     </select>
     <input v-model="cohort" placeholder="Cohort toevoegen" type="text">
-    <button class="btn btn-primary" v-on:click="createCohort">Voeg een cohort toe</button>
+    <button class="btn btn-primary" v-on:click="createCohort">Voeg cohort toe</button>
     <modulelist :cohort="selected"></modulelist>
   </div>
 </template>

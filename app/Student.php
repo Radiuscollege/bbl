@@ -43,13 +43,15 @@ class Student extends Model
     //divided by the amount it actually takes
     public function getEstimatedProgressAttribute()
     {
-        if ($this->studentModules()->exists()) {
-            $startedOn = new Carbon($this->attributes['started_on']);
-            $lastDate = new Carbon($this->studentModules()->latest('finish_date')->first()->finish_date);
-            
-            return $startedOn->diffInWeeks($lastDate) / $this->cohort->modules->sum('week_duration') * 100;
-        } else {
-            return 0;
+        if ($this->cohort->modules->isNotEmpty() && $this->studentModules->isNotEmpty()) {
+            if ($this->studentModules()->exists()) {
+                $startedOn = new Carbon($this->attributes['started_on']);
+                $lastDate = new Carbon($this->studentModules()->latest('finish_date')->first()->finish_date);
+                
+                return $startedOn->diffInWeeks($lastDate) / $this->cohort->modules->sum('week_duration') * 100;
+            } else {
+                return 0;
+            }
         }
     }
     

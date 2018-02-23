@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use App\User;
 use App\Student;
 use App\Cohort;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class StudentController extends Controller
         return view('addstudent');
     }
 
-    //show list of students to teacher or show studentinfo to student itself
+    //return list of students to teacher or show studentinfo to student itself
     public function showAll()
     {
         if (Auth::user()->isTeacher()) {
@@ -112,6 +113,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
+        //checks if student_id doesnt exist yet
         $validatedData = $request->validate([
             'studentNumber' => 'required|unique:students,student_id|max:20',
             'cohorts' => 'required',
@@ -120,6 +122,8 @@ class StudentController extends Controller
             'lastName' => 'required|max:40',
             'date' => 'required|date',
         ]);
+        //checks if the student_id exists in the user table
+        User::findOrFail(request('studentNumber'));
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
@@ -152,17 +156,6 @@ class StudentController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Student  $student
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Student $student)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -180,6 +173,12 @@ class StudentController extends Controller
             'lastName' => 'required|max:40',
             'date' => 'required|date',
         ])->validate();
+
+        //checks if the student_id exists in the user table
+        if(!User::find(request('student_id')))
+        {
+            return response()->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
+        }
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
