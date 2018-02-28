@@ -23,6 +23,7 @@ class CreateStudentsTable extends Migration
             $table->string('prefix')->nullable();
             $table->string('last_name');
             $table->date('started_on');
+            $table->boolean('graduated')->default(false);
             $table->softDeletes('deleted_at');
             $table->timestamps();
         });

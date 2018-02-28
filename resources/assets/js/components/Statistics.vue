@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1>Cohort info</h1>
-    <button v-on:click="print" class="btn btn-primary float-right d-print-none">Uitprinten</button>
+    <button v-on:click="print" class="btn btn-primary float-right d-print-none">Printen</button>
     <div class="row">
       <div class="card my-auto col-6">
         <ul class="list-group list-group-flush text-center">

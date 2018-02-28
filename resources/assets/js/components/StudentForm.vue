@@ -1,6 +1,6 @@
 <template>
   <form v-on:submit.prevent class="form-horizontal">
-    <button v-if="studentInfo !== undefined" v-on:click="print" class="btn btn-primary float-right d-print-none">Uitprinten</button>
+    <button v-if="studentInfo !== undefined" v-on:click="print" class="btn btn-primary float-right d-print-none">Printen</button>
     <fieldset :disabled="isStudent">
       <div v-if="error" class="alert alert-danger">
           {{error}}
@@ -32,7 +32,7 @@
       <div class="form-group row">
         <label for="cohort" class="col-sm-2 col-form-label">Cohort</label>
         <div class="col-sm-5">
-          <multiselect v-if="!isStudent" v-model="selectedObjects"
+          <multiselect v-if="!isStudent && studentInfo === undefined" v-model="selectedObjects"
             :class="{ 'is-danger': errors.has('cohort') }"
             :options="cohorts"
             :disabled="studentInfo !== undefined"
@@ -42,7 +42,7 @@
             label="name" 
             track-by="id">
           </multiselect>
-          <input v-else v-model="student.cohort.name" class="form-control" type="text" placeholder="Cohort">
+          <input v-else v-model="student.cohort.name" class="form-control" type="text" placeholder="Cohort" disabled>
         </div>
       </div>
       <div class="form-group row">
@@ -54,7 +54,7 @@
       <div v-if="student.progress !== undefined" class="form-group row">
         <label for="inputPrefix" class="col-sm-2 col-form-label">Geslaagd</label>
         <div class="col-sm-5 my-auto">
-          <span v-if="student.progress == 100" class="fa-layers fa-fw">
+          <span v-if="student.graduated == true" class="fa-layers fa-fw">
             <i class="fas fa-graduation-cap" data-fa-transform="grow-8"></i>
           </span>
           <span v-else class="fa-layers fa-fw">
@@ -171,13 +171,17 @@ export default {
         })
         .catch(err => {
           this.submitted = false;
-          this.error = err.response.data.errors.studentNumber[0];
+          if (err.response.data.errors === undefined) {
+            this.error = err.response.data;
+          } else {
+            this.error = err.response.data.errors.studentNumber[0];
+          }
         })
       }
     },
     //check if user is sure to delete the student (confirm can be without the window prefix)
     deleteStudent: function() {
-      if (confirm("Weet je zeker dat je de student wilt verwijderen? (student wordt gearchiveerd)")) {
+      if (confirm("Weet je zeker dat je de student wilt verwijderen? (student wordt gearchiveerd in de database)")) {
         this.submitted = true;
         axios
         .delete("/api/student/" + this.student.id, {

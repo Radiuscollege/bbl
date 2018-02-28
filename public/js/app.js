@@ -90798,8 +90798,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_multiselect__ = __webpack_require__(147);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_multiselect___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_multiselect__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vee_validate__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__FileUpload__ = __webpack_require__(148);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__FileUpload___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__FileUpload__);
 //
 //
 //
@@ -90853,7 +90851,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
+//import fileupload from "./FileUpload";
 
 Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
 
@@ -90873,7 +90871,7 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
       options: { placeholder: { text: "Voeg hier een beschrijving toe" } },
       submitted: false,
       error: "",
-      attachment: { name: null, file: null },
+      //attachment: { name: null, file: null },
       text: ""
     };
   },
@@ -90882,6 +90880,20 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
       this.selectedIds = newValues.map(function (obj) {
         return obj.id;
       });
+      /*var same = _.intersection([this.selectedObjects, this.cohorts]);
+      var cohorts = _.difference([this.selectedObjects, this.cohorts]);
+      console.log(_.pullAll(this.cohorts, this.selectedObjects)); //dit!!
+      console.log(this.cohorts)
+      //nu is bv testy hetzelfde en heeft disabled,
+      //maar moet wel testy weghale
+      //en dan daarna weer in cohort toevoegen
+      this.cohorts = cohorts.push(same.map(function(el) {
+        var o = Object.assign({}, el);
+        o.$isDisabled = true;
+        return o;
+      }));
+       console.log({s: same, c: cohorts, cf: this.cohorts, so: this.selectedObjects})
+      */
     }
   },
   components: {
@@ -90938,7 +90950,11 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
           document.location.href = "../module";
         }).catch(function (err) {
           _this3.submitted = false;
-          _this3.error = err.response.data.errors.name[0];
+          if (err.response.data.errors === undefined) {
+            _this3.error = err.response.data;
+          } else {
+            _this3.error = err.response.data.errors.name[0];
+          }
         });
       } else {
         axios.post("/api/module", {
@@ -90967,17 +90983,17 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_2_vee_validate__["a" /* default */]);
       });
     } /*
       onFileChange(e) {
-       console.log("FILECHANGE");
-       this.attachment.file = e.target.files || e.dataTransfer.files;
-       this.attachment.name = e.target.name;
-        var data = new FormData();
-       data.append("attachment", this.attachment.file);
-       axios.post(
-         "/api/upload/" +
-           _.last(window.location.pathname.split("/"), data, {
-             headers: { "Content-Type": "multipart/form-data" }
-           })
-       );
+      console.log("FILECHANGE");
+      this.attachment.file = e.target.files || e.dataTransfer.files;
+      this.attachment.name = e.target.name;
+       var data = new FormData();
+      data.append("attachment", this.attachment.file);
+      axios.post(
+        "/api/upload/" +
+          _.last(window.location.pathname.split("/"), data, {
+            headers: { "Content-Type": "multipart/form-data" }
+          })
+      );
       }*/
   }
 });
@@ -94384,7 +94400,7 @@ var render = function() {
           staticClass: "btn btn-primary float-right d-print-none",
           on: { click: _vm.print }
         },
-        [_vm._v("Uitprinten")]
+        [_vm._v("Printen")]
       ),
       _vm._v(" "),
       _c(
@@ -96196,7 +96212,11 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_3_vee_validate__["a" /* default */]);
           _this2.error = "";
         }).catch(function (err) {
           _this2.submitted = false;
-          _this2.error = err.response.data.errors.studentNumber[0];
+          if (err.response.data.errors === undefined) {
+            _this2.error = err.response.data;
+          } else {
+            _this2.error = err.response.data.errors.studentNumber[0];
+          }
         });
       }
     },
@@ -96204,7 +96224,7 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_3_vee_validate__["a" /* default */]);
     deleteStudent: function deleteStudent() {
       var _this3 = this;
 
-      if (confirm("Weet je zeker dat je de student wilt verwijderen? (student wordt gearchiveerd)")) {
+      if (confirm("Weet je zeker dat je de student wilt verwijderen? (student wordt gearchiveerd in de database)")) {
         this.submitted = true;
         axios.delete("/api/student/" + this.student.id, {
           studentNumber: this.student.student_id,
@@ -96264,7 +96284,7 @@ var render = function() {
               staticClass: "btn btn-primary float-right d-print-none",
               on: { click: _vm.print }
             },
-            [_vm._v("Uitprinten")]
+            [_vm._v("Printen")]
           )
         : _vm._e(),
       _vm._v(" "),
@@ -96482,7 +96502,7 @@ var render = function() {
             "div",
             { staticClass: "col-sm-5" },
             [
-              !_vm.isStudent
+              !_vm.isStudent && _vm.studentInfo === undefined
                 ? _c("multiselect", {
                     directives: [
                       {
@@ -96519,7 +96539,11 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
-                    attrs: { type: "text", placeholder: "Cohort" },
+                    attrs: {
+                      type: "text",
+                      placeholder: "Cohort",
+                      disabled: ""
+                    },
                     domProps: { value: _vm.student.cohort.name },
                     on: {
                       input: function($event) {
@@ -96592,7 +96616,7 @@ var render = function() {
               ),
               _vm._v(" "),
               _c("div", { staticClass: "col-sm-5 my-auto" }, [
-                _vm.student.progress == 100
+                _vm.student.graduated == true
                   ? _c("span", { staticClass: "fa-layers fa-fw" }, [
                       _c("i", {
                         staticClass: "fas fa-graduation-cap",

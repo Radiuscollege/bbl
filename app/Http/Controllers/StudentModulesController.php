@@ -145,8 +145,10 @@ class StudentModulesController extends Controller
 
         $finishDate = new Carbon(request('finishDate'));
         
-        //check if begindate is after to finishdate, return error if so. I use it in this way instead of in the laravel validation
-        //because before_or_equal in laravel will call a datetime converter PHP function but I already converted the string to a datetime with carbon
+        //check if begindate is after to finishdate, return error if so.
+        //I use it in this way instead of in the laravel validation
+        //because before_or_equal in laravel will call a datetime converter PHP function
+        //but I already converted the string to a datetime with carbon
         if ($beginDate->gt($finishDate)) {
             return response()->json('Begindatum is later dan de einddatum', 500);
         }
@@ -182,6 +184,24 @@ class StudentModulesController extends Controller
             } else {
                 $exists->update($array);
             }
+        }
+        $student = Student::FindOrFail(request('student'));
+        if ($student->cohort->modules->isNotEmpty() && $student->studentModules->isNotEmpty()) {
+            $avg = [];
+            foreach ($student->studentModules as $studentModule) {
+                if ($studentModule->approved_by != null) {
+                    array_push($avg, $studentModule->module->week_duration);
+                }
+            }
+
+            $progress = array_sum($avg) / $student->cohort->modules->sum('week_duration');
+            
+            if ($progress >= 1) {
+                $student->update(['graduated' => 1]);
+            } else {
+                $student->update(['graduated' => 0]);
+            }
+            //return (array_sum($avg) / $student->cohort->modules->sum('week_duration')) * 100;
         }
 
         return $exists;

@@ -106,7 +106,7 @@ class ModuleController extends Controller
         $validatedData = $request->validate([
             'name' => ['required', 'max:40', Rule::unique('modules')->ignore($id)],
             'subDescription' => 'max:140',
-            'weekDuration' => 'required|numeric|max:999'
+            'weekDuration' => 'required|numeric|max:999',
         ]);
 
         $module = Module::findOrFail($id);
@@ -114,6 +114,23 @@ class ModuleController extends Controller
         $module->sub_description = request('subDescription');
         $module->week_duration = request('weekDuration');
         $module->long_description = request('longDescription');
+        
+        //compares if a value doesn't exist in the second array anymore.
+        $diff = array_diff($module->cohorts->pluck('id')->toArray(), request('cohorts'));
+
+        //checks if a cohort got deleted, if so show the name in the error.
+        if (!empty($diff)) {
+            $cohort = $module->cohorts->whereIn('id', $diff);
+            if (count($diff) == 1) {
+                return response()
+                    ->json($cohort->implode('name', ', ') . " is geprobeerd te verwijderen, dit wordt tegengehouden 
+                    omdat een student in het verwijderde cohort al met de huidige module kan bezig zijn.", 422);
+            } else {
+                return response()
+                    ->json($cohort->implode('name', ', ') . " zijn geprobeerd te verwijderen, dit wordt tegengehouden 
+                    omdat een student in de verwijderde cohorten al met de huidige module kan bezig zijn.", 422);
+            }
+        }
 
         $cohorts = request('cohorts');
         $module->cohorts()->sync($cohorts);

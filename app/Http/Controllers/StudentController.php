@@ -122,8 +122,11 @@ class StudentController extends Controller
             'lastName' => 'required|max:40',
             'date' => 'required|date',
         ]);
+
         //checks if the student_id exists in the user table
-        User::findOrFail(request('studentNumber'));
+        if (!User::find(request('studentNumber'))) {
+            return response()->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
+        }
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
@@ -175,8 +178,7 @@ class StudentController extends Controller
         ])->validate();
 
         //checks if the student_id exists in the user table
-        if(!User::find(request('student_id')))
-        {
+        if (!User::find(request('studentNumber'))) {
             return response()->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
         }
 

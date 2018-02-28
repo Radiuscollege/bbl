@@ -17,9 +17,8 @@ class Teacher
     
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->type == "student")
-        {
-            return response('Alleen toegangbaar voor docenten.', 401);
+        if (Auth::check() && Auth::user()->type == "student") {
+            return response('Alleen toegankelijk voor docenten.', 401);
         }
         
         return $next($request);

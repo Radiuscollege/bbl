@@ -27,7 +27,7 @@
         <multiselect v-model="selectedObjects"
           :class="{ 'is-danger': errors.has('cohort') }"
           :options="cohorts"
-          :multiple="true" 
+          :multiple="true"
           v-validate="'required'"
           placeholder="Kies cohort(en)"
           name="cohort"
@@ -42,7 +42,7 @@
     </medium-editor>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary" >Opslaan</button>
+        <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary">Opslaan</button>
       </div>
     </div>
   </form>
@@ -51,7 +51,7 @@
 import editor from "vue2-medium-editor";
 import Multiselect from "vue-multiselect";
 import VeeValidate from "vee-validate";
-import fileupload from "./FileUpload";
+//import fileupload from "./FileUpload";
 
 Vue.use(VeeValidate);
 
@@ -71,14 +71,28 @@ export default {
       options: { placeholder: { text: "Voeg hier een beschrijving toe" } },
       submitted: false,
       error: "",
-      attachment: { name: null, file: null },
+      //attachment: { name: null, file: null },
       text: ""
     };
   },
   watch: {
     selectedObjects(newValues) {
       this.selectedIds = newValues.map(obj => obj.id);
-    }
+      /*var same = _.intersection([this.selectedObjects, this.cohorts]);
+      var cohorts = _.difference([this.selectedObjects, this.cohorts]);
+      console.log(_.pullAll(this.cohorts, this.selectedObjects)); //dit!!
+      console.log(this.cohorts)
+      //nu is bv testy hetzelfde en heeft disabled,
+      //maar moet wel testy weghale
+      //en dan daarna weer in cohort toevoegen
+      this.cohorts = cohorts.push(same.map(function(el) {
+        var o = Object.assign({}, el);
+        o.$isDisabled = true;
+        return o;
+      }));
+
+      console.log({s: same, c: cohorts, cf: this.cohorts, so: this.selectedObjects})
+    */}
   },
   components: {
     "medium-editor": editor,
@@ -135,7 +149,11 @@ export default {
           })
           .catch(err => {
             this.submitted = false;
-            this.error = err.response.data.errors.name[0];
+            if (err.response.data.errors === undefined) {
+              this.error = err.response.data;
+            } else {
+              this.error = err.response.data.errors.name[0];
+            }
           });
       } else {
         axios
@@ -163,7 +181,7 @@ export default {
         }
         this.error = "Je hebt iets incorrect ingevuld.";
       });
-    }/*
+    } /*
     onFileChange(e) {
       console.log("FILECHANGE");
       this.attachment.file = e.target.files || e.dataTransfer.files;
