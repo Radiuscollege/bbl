@@ -180,6 +180,7 @@ class StudentModulesController extends Controller
                     'begin_date' => $beginDate->toDateString(),
                     'finish_date' => null,
                     'note' => request('note')
+                    //graduated
                 ]);
             } else {
                 $exists->update($array);
@@ -188,20 +189,14 @@ class StudentModulesController extends Controller
         $student = Student::FindOrFail(request('student'));
         if ($student->cohort->modules->isNotEmpty() && $student->studentModules->isNotEmpty()) {
             $avg = [];
+            //check if student has a module that hasn't been finished, if so do not graduate student
             foreach ($student->studentModules as $studentModule) {
-                if ($studentModule->approved_by != null) {
-                    array_push($avg, $studentModule->module->week_duration);
+                if ($studentModule->approved_by == null) {
+                    $student->update(['graduated' => 0]);
+                    break;
                 }
-            }
-
-            $progress = array_sum($avg) / $student->cohort->modules->sum('week_duration');
-            
-            if ($progress >= 1) {
                 $student->update(['graduated' => 1]);
-            } else {
-                $student->update(['graduated' => 0]);
             }
-            //return (array_sum($avg) / $student->cohort->modules->sum('week_duration')) * 100;
         }
 
         return $exists;

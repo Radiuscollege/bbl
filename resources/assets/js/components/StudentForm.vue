@@ -137,9 +137,9 @@ export default {
         .put("/api/student/" + _.last(window.location.pathname.split("/")), {
           student_id: this.student.student_id,
           cohorts: this.selectedIds,
-          firstName: this.student.first_name,
+          first_name: this.student.first_name,
           prefix: this.student.prefix,
-          lastName: this.student.last_name,
+          last_name: this.student.last_name,
           date: this.student.started_on
         })
         .then(res => {
@@ -158,11 +158,11 @@ export default {
       else {
       axios
         .post("/api/student", {
-          studentNumber: this.student.student_id,
+          student_id: this.student.student_id,
           cohorts: this.selectedIds,
-          firstName: this.student.first_name,
+          first_name: this.student.first_name,
           prefix: this.student.prefix,
-          lastName: this.student.last_name,
+          last_name: this.student.last_name,
           date: this.student.started_on
         })
         .then(res => {
@@ -185,11 +185,11 @@ export default {
         this.submitted = true;
         axios
         .delete("/api/student/" + this.student.id, {
-          studentNumber: this.student.student_id,
+          student_id: this.student.student_id,
           cohorts: this.selectedIds,
-          firstName: this.student.first_name,
+          first_name: this.student.first_name,
           prefix: this.student.prefix,
-          lastName: this.student.last_name,
+          last_name: this.student.last_name,
           date: this.student.started_on
         })
         .then(res => {

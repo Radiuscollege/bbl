@@ -29,11 +29,12 @@ class Student extends Model
         if ($this->cohort->modules->isNotEmpty() && $this->studentModules->isNotEmpty()) {
             $avg = [];
             foreach ($this->studentModules as $studentModule) {
-                if ($studentModule->approved_by != null) {
+                if ($studentModule->approved_by != null && $studentModule->module->week_duration != 0) {
                     array_push($avg, $studentModule->module->week_duration);
                 }
             }
-            return (array_sum($avg) / $this->cohort->modules->sum('week_duration')) * 100;
+            return (array_sum($avg) / $this->cohort->modules
+                ->whereNotIn('week_duration', [0])->sum('week_duration')) * 100;
         } else {
             return 0;
         }

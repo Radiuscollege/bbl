@@ -1,5 +1,6 @@
 <template>
-<div class="container">
+<div class="container pt-3">
+  <span v-if="filteredModules">
   <div class="row" v-for="module in filteredModules" :key="module.id" v-if="module">
     <div class="col-8">
       <div class="card bg-light mt-3">
@@ -8,7 +9,7 @@
           <p class="card-text">{{module.sub_description}}</p>
         </div>
         <div class="card-footer bg-transparent border-success">
-          <a data-toggle="collapse" :href='"#collapse" + module.id'  aria-expanded="true" :aria-controls='"collapse" + module.id'>
+          <a v-if="module.long_description" data-toggle="collapse" :href='"#collapse" + module.id'  aria-expanded="true" :aria-controls='"collapse" + module.id'>
             Uitleg
           </a>
           <div class="float-right"><a v-bind:href="'/module/' + module.id" role="button" class="btn btn-primary">Wijzigen</a>
@@ -33,12 +34,16 @@
       </div>
     </div>
   </div>
+</span>
+<span v-else>
+  <div class="alert alert-primary" role="alert">
+    Er is geen module bij deze cohort gevonden, voeg een toe bij <a href="module/add">Module toevoegen</a>
+  </div>
+</span>
 </div>
 </template>
 <script>
 import editor from "vue2-medium-editor";
-
-window.$ = window.jQuery = require("jquery");
 
 export default {
   name: "modulelist",
@@ -71,11 +76,18 @@ export default {
     }
   },
   computed: {
+    //returns modules depending on what cohort is selected in dropdownlist
     filteredModules: function() {
-      if(this.cohort == "All"){
+      if(this.cohort == "Alle cohorten tonen"){
         return this.modules;
       }
-      return _.filter(this.modules, { cohorts: [ { name: this.cohort } ]});
+      //filters the modules by checking in the child of a module if the name matches
+      var filtered = _.filter(this.modules, { cohorts: [ { name: this.cohort } ]})
+      console.log(filtered);
+      if (!Array.isArray(filtered) || !filtered.length) {
+        return null;
+      }
+      return filtered;
     }
   }
 };

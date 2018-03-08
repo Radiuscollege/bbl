@@ -106,7 +106,6 @@
               </p>
               <div v-else class="card-body">
                 <p class="card-text">&nbsp;</p>
-                <p class="card-text">&nbsp;</p>
               </div>
             </div>
             <div v-else class="card-body">
@@ -182,7 +181,7 @@ export default {
         firstName: "",
         prefix: "",
         lastName: "",
-        date: null,
+        date: null
       },
       submittedBegin: false
     };
@@ -205,14 +204,19 @@ export default {
           //sort by approved modules, after that by a started module
           this.moduleList[0].modules = _.sortBy(this.moduleList[0].modules, [
             function(module) {
-              return module.student_modules[0].approved_by;
+              if (module.student_modules[0]) {
+                return module.student_modules[0].approved_by;
+              }
             },
             function(module) {
-              return module.student_modules[0].begin_date;
+              if (module.student_modules[0]) {
+                return module.student_modules[0].begin_date;
+              }
             }
           ]);
         })
         .catch(err => {
+          console.log(err);
           this.error = true;
         });
     },

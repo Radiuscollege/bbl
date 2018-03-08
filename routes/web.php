@@ -11,9 +11,15 @@
 |
 */
 
-Route::get('/', 'UserController@index');
+Route::get('/', 'UserController@index')->name('home');
 
+//catch emitted url from AmoClient after successful login
 Route::get('/amoclient/ready', function () {
+    return redirect()->route('home');
+});
+
+//catch emitted url from AmoClient when not logged in
+Route::get('/login', function () {
     return view('login');
 })->name('login');
 

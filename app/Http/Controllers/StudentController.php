@@ -115,28 +115,30 @@ class StudentController extends Controller
     {
         //checks if student_id doesnt exist yet
         $validatedData = $request->validate([
-            'studentNumber' => 'required|unique:students,student_id|max:20',
+            //its student_id instead of studentNumber cause student_id
+            'student_id' => "required|unique:students,student_id|max:20",
             'cohorts' => 'required',
-            'firstName' => 'required|max:40',
+            'first_name' => 'required|max:40',
             'prefix' => 'max:40',
-            'lastName' => 'required|max:40',
+            'last_name' => 'required|max:40',
             'date' => 'required|date',
         ]);
 
         //checks if the student_id exists in the user table
-        if (!User::find(request('studentNumber'))) {
-            return response()->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
+        if (!User::find(request('student_id'))) {
+            return response()
+                ->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
         }
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
 
         $student = Student::create([
-            'student_id' => request('studentNumber'),
+            'student_id' => request('student_id'),
             'cohort_id' => request('cohorts'),
-            'first_name' => request('firstName'),
+            'first_name' => request('first_name'),
             'prefix' => request('prefix'),
-            'last_name' => request('lastName'),
+            'last_name' => request('last_name'),
             'started_on' => $finalDate,
         ]);
 
@@ -171,15 +173,16 @@ class StudentController extends Controller
         Validator::make($request->all(), [
             'student_id' => ['required', 'max:20',
             Rule::unique('students')->ignore(request('student_id'), 'student_id')],
-            'firstName' => 'required|max:40',
+            'first_name' => 'required|max:40',
             'prefix' => 'max:40',
-            'lastName' => 'required|max:40',
+            'last_name' => 'required|max:40',
             'date' => 'required|date',
         ])->validate();
 
         //checks if the student_id exists in the user table
-        if (!User::find(request('studentNumber'))) {
-            return response()->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
+        if (!User::find(request('student_id'))) {
+            return response()
+                ->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
         }
 
         $date = strtotime(request('date'));
@@ -189,9 +192,9 @@ class StudentController extends Controller
 
         $student->update([
             'student_id' => request('student_id'),
-            'first_name' => request('firstName'),
+            'first_name' => request('first_name'),
             'prefix' => request('prefix'),
-            'last_name' => request('lastName'),
+            'last_name' => request('last_name'),
             'started_on' => $finalDate,
         ]);
 
