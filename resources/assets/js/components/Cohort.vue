@@ -1,20 +1,28 @@
 <template>
-  <div class="row justify-content-center">
-    <multiselect v-model="selected"
-      :options="cohorts"
-      :allow-empty="false"
-      :show-labels="false"
-      class="col-md-4"
-      placeholder="Kies cohort(en)"
-      name="cohort"
-      label="name"
-      track-by="id"
-      ref="multiselect">
-    </multiselect>
-    <input v-model="cohort" placeholder="Cohort toevoegen" type="text" maxlength="80">
-    <button class="btn btn-primary" v-on:click="createCohort" :disabled="submitted">Voeg cohort toe</button>
-    <modulelist :cohort="selected.name"></modulelist>
-  </div>
+  <span>
+    <div v-if="success" class="alert alert-primary">
+      {{success}}
+    </div>
+    <div v-if="error" class="alert alert-danger">
+      {{error}}
+    </div>
+    <div class="row justify-content-center">
+      <multiselect v-model="selected"
+        :options="cohorts"
+        :allow-empty="false"
+        :show-labels="false"
+        class="col-md-4"
+        placeholder="Kies cohort(en)"
+        name="cohort"
+        label="name"
+        track-by="id"
+        ref="multiselect">
+      </multiselect>
+      <input v-model="cohort" placeholder="Cohort toevoegen" type="text" maxlength="80">
+      <button class="btn btn-primary" v-on:click="createCohort" :disabled="submitted">Voeg cohort toe</button>
+      <modulelist :cohort="selected.name"></modulelist>
+    </div>
+  </span>
 </template>
 <script>
 import Multiselect from "vue-multiselect";
@@ -26,7 +34,9 @@ export default {
       cohorts: [{ id: "", name: "" }],
       cohort: "",
       selected: { id: 0, name: "Alle cohorten tonen" },
-      submitted: false
+      submitted: false,
+      error: "",
+      success: ""
     };
   },
   components: {
@@ -53,17 +63,13 @@ export default {
         .then(res => {
           this.submitted = false;
           this.getCohorts();
-          this.selected = { name: submittedCohort };
-          /* open dropdownlist and close
-          this.$refs.multiselect.$el.focus();
-          setTimeout(() => {
-            this.$refs.multiselect.$refs.search.blur();
-          }, 1000);
-          */
+          this.error = "";
+          this.success = submittedCohort + " is succesvol als cohort toegevoegd!"
         })
         .catch(err => {
-          window.alert("Er iets mis gegaan, misschien bestaat deze cohort al?");
           this.submitted = false;
+          this.success = "";
+          this.error = "Er iets mis gegaan, deze cohort bestaat al.";
         });
     }
   }

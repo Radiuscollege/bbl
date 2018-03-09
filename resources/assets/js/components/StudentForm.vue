@@ -2,7 +2,7 @@
   <form v-on:submit.prevent class="form-horizontal">
     <button v-if="studentInfo !== undefined" v-on:click="print" class="btn btn-primary float-right d-print-none">Printen</button>
     <fieldset :disabled="isStudent">
-      <div v-if="error" class="alert alert-danger">
+      <div v-if="error" class="alert alert-danger d-print-none">
           {{error}}
       </div>
       <div class="form-group row">
@@ -151,7 +151,7 @@ export default {
           if (err.response.data.errors === undefined) {
             this.error = err.response.data;
           } else {
-            this.error = err.response.data.errors.studentNumber[0];
+            this.error = err.response.data.errors.student_id[0];
           }
         })
       }
@@ -174,7 +174,7 @@ export default {
           if (err.response.data.errors === undefined) {
             this.error = err.response.data;
           } else {
-            this.error = err.response.data.errors.studentNumber[0];
+            this.error = err.response.data.errors.student_id[0];
           }
         })
       }

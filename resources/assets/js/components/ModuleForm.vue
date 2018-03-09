@@ -38,8 +38,13 @@
     </div>
     <br>
     <!--<fileupload :location="'/api/upload/' + module.id"></fileupload>-->
-    <medium-editor :text='module.long_description' :options='options' v-on:edit='processEditOperation' custom-tag='div'>
-    </medium-editor>
+    <div class="form-group row">
+      <label for="cohort" class="col-sm-2 col-form-label">Lange beschrijving</label>
+    </div>
+    <div class="col-sm-8">
+      <medium-editor :text='module.long_description' :options='options' v-on:edit='processEditOperation' custom-tag='div'>
+      </medium-editor>
+    </div>
     <div class="form-group row">
       <div class="col-sm-10">
         <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary">Opslaan</button>
