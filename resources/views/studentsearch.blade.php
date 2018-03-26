@@ -7,5 +7,6 @@
 </ol>
 @endsection
 @section('content')
+<studentsearch></studentsearch>
 <studentsearchresult></studentsearchresult>
 @endsection

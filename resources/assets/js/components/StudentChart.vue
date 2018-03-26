@@ -3,13 +3,16 @@ import { HorizontalBar } from "vue-chartjs";
 
 export default {
   extends: HorizontalBar,
+  props: {
+    student: { type: Object, required: true },
+    isStudent: { type: Boolean, default: false, required: false }
+  },
   data: function() {
     return {
       datacollection: {},
       markAverage: []
     };
   },
-  props: ["student", "isStudent"],
   created: function() {
     this.getAverage();
   },
@@ -18,9 +21,11 @@ export default {
     getAverage: function() {
       axios
         .get(
-          this.isStudent ? "/api/statistics/average" : "/api/statistics/" +
-            _.last(window.location.pathname.split("/")) +
-            "/average" 
+          this.isStudent
+            ? "/api/statistics/average"
+            : "/api/statistics/" +
+              _.last(window.location.pathname.split("/")) +
+              "/average"
         )
         .then(res => {
           this.markAverage = res.data;

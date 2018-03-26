@@ -146,9 +146,9 @@ class StudentModulesController extends Controller
         $finishDate = new Carbon(request('finishDate'));
         
         //check if begindate is after to finishdate, return error if so.
-        //I use it in this way instead of in the laravel validation
+        //It is in this way instead of in the laravel validation
         //because before_or_equal in laravel will call a datetime converter PHP function
-        //but I already converted the string to a datetime with carbon
+        //but  the string is already converted to a datetime with carbon
         if ($beginDate->gt($finishDate)) {
             return response()->json('Begindatum is later dan de einddatum', 500);
         }
@@ -180,7 +180,6 @@ class StudentModulesController extends Controller
                     'begin_date' => $beginDate->toDateString(),
                     'finish_date' => null,
                     'note' => request('note')
-                    //graduated
                 ]);
             } else {
                 $exists->update($array);

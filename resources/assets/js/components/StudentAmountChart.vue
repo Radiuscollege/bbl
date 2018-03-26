@@ -3,12 +3,12 @@ import { Bar } from "vue-chartjs";
 
 export default {
   extends: Bar,
+  props: { moduleInfo: { type: Array, required: true } },
   data: function() {
     return {
       datacollection: {}
     };
   },
-  props: ["moduleInfo"],
   mounted: function() {
     this.datacollection = {
       datacollection: {
@@ -20,9 +20,9 @@ export default {
             data: _.map(this.moduleInfo, "student_modules_count")
           },
           {
-            label: 'Studenten afgerond',
+            label: "Studenten afgerond",
             backgroundColor: "#f87979",
-            data: _.map(this.moduleInfo, 'finished_modules_count')
+            data: _.map(this.moduleInfo, "finished_modules_count")
           }
         ]
       }

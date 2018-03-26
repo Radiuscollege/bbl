@@ -30,8 +30,10 @@ class StatisticsController extends Controller
 
     public function showStatistics()
     {
+        //count students which aren't graduated yet
         $students = Student::where('graduated', false)->count();
 
+        //count students who are in a certain cohort
         $cohorts = Cohort::withCount(['students as student_cohort_count' => function ($query) {
             $query->where('graduated', false);
         }])
@@ -39,8 +41,9 @@ class StatisticsController extends Controller
             $query->where('graduated', false);
         }])->get();
 
+        //count students who are either busy or finished with a certain module, also calculate the average mark
         $moduleInfo = Module::withCount(['studentModules as student_modules_count' => function ($query) {
-            $query->where('approved_by', null);
+            $query->whereNotNull('begin_date')->whereNull('approved_by');
         },
         'studentModules as finished_modules_count' => function ($query) {
             $query->whereNotNull('approved_by');
@@ -53,7 +56,7 @@ class StatisticsController extends Controller
         return [ "cohorts" => $cohorts, "student_amount" => $students, "module_info" => $moduleInfo ];
     }
 
-    //Gets all the modules with mark and names of a student that this current student has too
+    //Gets all the modules with a mark of the requested student
     public function getAverageMarks(Request $request, $id)
     {
         $student = Student::with([
@@ -65,6 +68,7 @@ class StatisticsController extends Controller
         return $this->getStatistics($student, $id);
     }
 
+    //get all modules with a mark from the active student
     public function getOwnMarks(Request $request)
     {
         $id = Student::where('student_id', Auth::user()->getID())->first()->id;
@@ -77,6 +81,7 @@ class StatisticsController extends Controller
         return $this->getStatistics($student, $id);
     }
 
+    //also get marks of other students and prepare the data for the chart visualization
     private function getStatistics($student, $id)
     {
         $nameArray = array();

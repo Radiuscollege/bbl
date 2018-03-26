@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "prettier",
+    "plugin:vue/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["vue", "prettier"],
+  "rules": {
+    "vue/html-closing-bracket-newline": [
+      "error",
+      {
+        "singleline": "never",
+        "multiline": "always"
+      }
+    ],
+    "vue/html-closing-bracket-spacing": [
+      "error",
+      {
+        "startTag": "never",
+        "endTag": "never",
+        "selfClosingTag": "always"
+      }
+    ]
+  }
+}

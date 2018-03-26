@@ -1,53 +1,115 @@
 <template>
-  <form v-on:submit.prevent class="form-horizontal">
-    <div v-if="error" class="alert alert-danger">
-        {{error}}
+  <form 
+    class="form-horizontal" 
+    @submit.prevent
+  >
+    <div 
+      v-if="error" 
+      class="alert alert-danger"
+    >
+      {{ error }}
     </div>
     <div class="form-group row">
-      <label for="inputName" class="col-sm-2 col-form-label">Naam</label>
+      <label 
+        for="inputName" 
+        class="col-sm-2 col-form-label"
+      >
+        Naam
+      </label>
       <div class="col-sm-5">
-        <input v-validate="'required|max:40'" :class="{'input': true, 'form-control': true, 'invalid': errors.has('name') }" v-model="module.name" name="name" type="text" placeholder="Naam">
+        <input 
+          v-validate="'required|max:40'" 
+          :class="{'input': true, 'form-control': true, 'invalid': errors.has('name') }" 
+          v-model="module.name" 
+          name="name" 
+          type="text" 
+          placeholder="Naam"
+        >
       </div>
     </div>
     <div class="form-group row">
-      <label for="inputSubDescription" class="col-sm-2 col-form-label">Sub beschrijving</label>
+      <label 
+        for="inputSubDescription" 
+        class="col-sm-2 col-form-label"
+      >
+        Sub beschrijving
+      </label>
       <div class="col-sm-5">
-        <input v-validate="'max:140'" name="subDescription" :class="{'input': true, 'form-control': true, 'invalid': errors.has('subDescription') }" v-model="module.sub_description" type="text" placeholder="Sub beschrijving">
+        <input 
+          v-validate="'max:140'" 
+          :class="{'input': true, 'form-control': true, 'invalid': errors.has('subDescription') }"
+          v-model="module.sub_description"  
+          name="subDescription" 
+          type="text" 
+          placeholder="Sub beschrijving"
+        >
       </div>
     </div>
     <div class="form-group row">
-      <label for="inputPeriod" class="col-sm-2 col-form-label">Duur in weken</label>
+      <label 
+        for="inputPeriod" 
+        class="col-sm-2 col-form-label"
+      >
+        Duur in weken
+      </label>
       <div class="col-sm-5">
-        <input v-validate="'required|numeric|max_value:100'" name="weekDuration" :class="{ 'input': true, 'form-control': true, 'invalid': errors.has('weekDuration') }" v-model="module.week_duration" type="number" placeholder="Duur in weken">
+        <input 
+          v-validate="'required|numeric|max_value:100'" 
+          :class="{ 'input': true, 'form-control': true, 'invalid': errors.has('weekDuration') }" 
+          v-model="module.week_duration" 
+          name="weekDuration" 
+          type="number" 
+          placeholder="Duur in weken"
+        >
       </div>
     </div>
     <div class="form-group row">
-      <label for="cohort" class="col-sm-2 col-form-label">Cohort</label>
+      <label 
+        for="cohort" 
+        class="col-sm-2 col-form-label"
+      >
+        Cohort
+      </label>
       <div class="col-sm-5">
-        <multiselect v-model="selectedObjects"
+        <multiselect 
+          v-validate="'required'"
+          v-model="selectedObjects"
           :class="{ 'is-danger': errors.has('cohort') }"
           :options="cohorts"
           :multiple="true"
-          v-validate="'required'"
           placeholder="Kies cohort(en)"
           name="cohort"
           label="name" 
-          track-by="id">
-        </multiselect>
+          track-by="id"
+        />
       </div>
     </div>
     <br>
-    <!--<fileupload :location="'/api/upload/' + module.id"></fileupload>-->
     <div class="form-group row">
-      <label for="cohort" class="col-sm-2 col-form-label">Lange beschrijving</label>
+      <label 
+        for="cohort" 
+        class="col-sm-2 col-form-label"
+      >
+        Lange beschrijving
+      </label>
     </div>
     <div class="col-sm-8">
-      <medium-editor :text='module.long_description' :options='options' v-on:edit='processEditOperation' custom-tag='div'>
-      </medium-editor>
+      <medium-editor 
+        :text="module.long_description" 
+        :options="options"  
+        custom-tag="div"
+        @edit="processEditOperation"
+      />
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button v-on:click="validateForm" :disabled="submitted" class="btn btn-primary">Opslaan</button>
+        <button 
+          :disabled="submitted" 
+          class="btn btn-primary" 
+          @click="validateForm"
+        >
+          Opslaan
+        </button>
       </div>
     </div>
   </form>
@@ -56,12 +118,15 @@
 import editor from "vue2-medium-editor";
 import Multiselect from "vue-multiselect";
 import VeeValidate from "vee-validate";
-//import fileupload from "./FileUpload";
 
 Vue.use(VeeValidate);
 
 export default {
-  name: "moduleform",
+  name: "Moduleform",
+  components: {
+    "medium-editor": editor,
+    Multiselect
+  },
   data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
@@ -76,32 +141,13 @@ export default {
       options: { placeholder: { text: "Voeg hier een beschrijving toe" } },
       submitted: false,
       error: "",
-      //attachment: { name: null, file: null },
       text: ""
     };
   },
   watch: {
     selectedObjects(newValues) {
       this.selectedIds = newValues.map(obj => obj.id);
-      /*var same = _.intersection([this.selectedObjects, this.cohorts]);
-      var cohorts = _.difference([this.selectedObjects, this.cohorts]);
-      console.log(_.pullAll(this.cohorts, this.selectedObjects)); //dit!!
-      console.log(this.cohorts)
-      //nu is bv testy hetzelfde en heeft disabled,
-      //maar moet wel testy weghale
-      //en dan daarna weer in cohort toevoegen
-      this.cohorts = cohorts.push(same.map(function(el) {
-        var o = Object.assign({}, el);
-        o.$isDisabled = true;
-        return o;
-      }));
-
-      console.log({s: same, c: cohorts, cf: this.cohorts, so: this.selectedObjects})
-    */}
-  },
-  components: {
-    "medium-editor": editor,
-    Multiselect
+    }
   },
   created: function() {
     this.getCohorts();
@@ -126,9 +172,6 @@ export default {
             this.module = res.data;
             this.text = module.long_description;
             this.selectedObjects = [];
-            //this.module.cohorts.forEach(function(element) {
-            //  this.selectedObjects.push({id: element.pivot.cohort_id, name: element.name})
-            //});
             for (var i = 0, len = this.module.cohorts.length; i < len; i++) {
               this.selectedObjects.push({
                 id: this.module.cohorts[i].pivot.cohort_id,
@@ -138,6 +181,7 @@ export default {
           });
       }
     },
+    //Save or update, depending on if module ID is in url
     saveModule: function() {
       this.submitted = true;
       if (_.isInteger(parseInt(_.last(window.location.pathname.split("/"))))) {
@@ -186,21 +230,7 @@ export default {
         }
         this.error = "Je hebt iets incorrect ingevuld.";
       });
-    } /*
-    onFileChange(e) {
-      console.log("FILECHANGE");
-      this.attachment.file = e.target.files || e.dataTransfer.files;
-      this.attachment.name = e.target.name;
-
-      var data = new FormData();
-      data.append("attachment", this.attachment.file);
-      axios.post(
-        "/api/upload/" +
-          _.last(window.location.pathname.split("/"), data, {
-            headers: { "Content-Type": "multipart/form-data" }
-          })
-      );
-    }*/
+    }
   }
 };
 </script>

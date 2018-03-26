@@ -20,7 +20,6 @@ Vue.component('cohortchart', require('./components/CohortChart.vue'));
 Vue.component('markmodal', require('./components/MarkModal.vue'));
 Vue.component('moduleform', require('./components/ModuleForm.vue'));
 Vue.component('modulelist', require('./components/ModuleList.vue'));
-Vue.component('fileupload', require('./components/FileUpload.vue'));
 Vue.component('statistics', require('./components/Statistics.vue'));
 Vue.component('student', require('./components/Student.vue'));
 Vue.component('studentamountchart', require('./components/StudentAmountChart.vue'));
