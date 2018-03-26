@@ -8,7 +8,7 @@
 <studentsearch></studentsearch>
 <div class="jumbotron">
 	<h1 class="display-4">Progress Tracker</h1>
-	<p class="lead">Dit is een app om de voortang van AMO BBL studenten te beheren.</p>
+	<p class="lead">Dit is een app om de voortgang van AMO BBL studenten te beheren.</p>
 	<hr class="my-4">
 	<p class="lead text-center">
 	  <a class="btn btn-outline-primary" href="{{ url('/module') }}">

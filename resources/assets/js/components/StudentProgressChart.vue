@@ -3,12 +3,14 @@ import { HorizontalBar } from "vue-chartjs";
 
 export default {
   extends: HorizontalBar,
+  props: {
+    student: { type: Object, required: true }
+  },
   data: function() {
     return {
       datacollection: {}
     };
   },
-  props: ["student"],
   created: function() {},
   mounted: function() {
     this.datacollection = {

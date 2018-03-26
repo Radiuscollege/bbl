@@ -3,56 +3,130 @@
     <transition name="modal">
       <div class="modal-mask">
         <div class="modal-wrapper">
-          <div class="modal-dialog" role="document">
+          <div 
+            class="modal-dialog" 
+            role="document"
+          >
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="markModalLabel">Beoordelen</h5>
-                <button type="button" class="close" v-on:click="$emit('close')">
+                <h5  
+                  id="markModalLabel"
+                  class="modal-title"
+                >
+                  Beoordelen
+                </h5>
+                <button 
+                  type="button" 
+                  class="close" 
+                  @click="$emit('close')"
+                >
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
               <div class="modal-body">
-                <div v-if="error" class="alert alert-danger">
-                    {{error}}
+                <div 
+                  v-if="error" 
+                  class="alert alert-danger"
+                >
+                  {{ error }}
                 </div>
                 <form>
                   <div class="form-group row">
-                    <label for="inputMark" class="col-sm-2 col-form-label">Cijfer:</label>
+                    <label 
+                      for="inputMark" 
+                      class="col-sm-2 col-form-label"
+                    >Cijfer:
+                    </label>
                     <div class="col">
-                      <input v-validate="'decimal:1|max_value:10'" name="mark" v-model="module[0].mark" type="number" :class="{ 'input': true, 'form-control': true, 'invalid': errors.has('mark') }" placeholder="0.0" step="0.1" min="0" max="10">
+                      <input 
+                        v-validate="'decimal:1|max_value:10'" 
+                        v-model="module[0].mark" 
+                        :class="{ 'input': true, 'form-control': true, 'invalid': errors.has('mark') }" 
+                        name="mark" 
+                        type="number" 
+                        placeholder="0.0" 
+                        step="0.1" 
+                        min="0" 
+                        max="10"
+                      >
                     </div>
-                    <label for="or" class="col-sm-2 col-form-label">of</label>
+                    <label 
+                      for="or" 
+                      class="col-sm-2 col-form-label"
+                    >
+                      of
+                    </label>
                     <div class="col my-auto">
                       <div class="form-check">
-                        <input v-model="module[0].pass" class="form-check-input" type="checkbox" id="gridCheck">
-                        <label class="form-check-label" for="gridCheck">
+                        <input  
+                          id="gridCheck"
+                          v-model="module[0].pass" 
+                          class="form-check-input" 
+                          type="checkbox"
+                        >
+                        <label 
+                          class="form-check-label" 
+                          for="gridCheck"
+                        >
                           Voldoende
                         </label>
                       </div>
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label for="beginDate" class="col-sm-3 col-form-label">Begindatum:</label>
+                    <label 
+                      for="beginDate" 
+                      class="col-sm-3 col-form-label"
+                    >
+                      Begindatum:
+                    </label>
                     <div class="col-sm-10">
-                      <datepicker v-model="module[0].beginDate" :disabled="{from: module[0].finishDate}"></datepicker>
+                      <datepicker 
+                        v-model="module[0].beginDate" 
+                        :disabled="{from: module[0].finishDate}"
+                      />
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label for="finishDate" class="col-sm-3 col-form-label">Einddatum:</label>
+                    <label 
+                      for="finishDate" 
+                      class="col-sm-3 col-form-label"
+                    >
+                      Einddatum:
+                    </label>
                     <div class="col-sm-10">
-                      <datepicker v-model="module[0].finishDate" :disabled="{to: module[0].beginDate}"></datepicker>
+                      <datepicker 
+                        v-model="module[0].finishDate" 
+                        :disabled="{to: module[0].beginDate}"
+                      />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label for="message-text" class="col-sm-2 col-form-label">Notitie:</label>
+                    <label 
+                      for="message-text" 
+                      class="col-sm-2 col-form-label"
+                    >
+                      Notitie:
+                    </label>
                     <div class="col">
-                      <textarea v-model="module[0].note" class="form-control" id="message-text"></textarea>
+                      <textarea 
+                        id="message-text"
+                        v-model="module[0].note" 
+                        class="form-control" 
+                      />
                     </div>
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
-                <button v-on:click="validateForm" :disabled="submitted" type="button" class="btn btn-primary">Beoordeel</button>
+                <button 
+                  :disabled="submitted" 
+                  class="btn btn-primary"
+                  type="button" 
+                  @click="validateForm"
+                >
+                  Beoordeel
+                </button>
               </div>
             </div>
           </div>
@@ -66,7 +140,11 @@ import Datepicker from "vuejs-datepicker";
 import VeeValidate from "vee-validate";
 
 export default {
-  name: "markmodal",
+  name: "Markmodal",
+  components: {
+    Datepicker
+  },
+  props: { studentModule: { type: Object, required: true } },
   data: function() {
     return {
       module: [
@@ -83,10 +161,6 @@ export default {
       submitted: false,
       error: ""
     };
-  },
-  props: ["studentModule"],
-  components: {
-    Datepicker
   },
   methods: {
     setMark: function() {
@@ -138,5 +212,3 @@ export default {
   vertical-align: middle;
 }
 </style>
-
-

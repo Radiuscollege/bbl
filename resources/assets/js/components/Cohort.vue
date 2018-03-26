@@ -1,13 +1,21 @@
 <template>
   <span>
-    <div v-if="success" class="alert alert-primary">
-      {{success}}
+    <div 
+      v-if="success" 
+      class="alert alert-primary"
+    >
+      {{ success }}
     </div>
-    <div v-if="error" class="alert alert-danger">
-      {{error}}
+    <div 
+      v-if="error" 
+      class="alert alert-danger"
+    >
+      {{ error }}
     </div>
     <div class="row justify-content-center">
-      <multiselect v-model="selected"
+      <multiselect 
+        ref="multiselect"
+        v-model="selected"
         :options="cohorts"
         :allow-empty="false"
         :show-labels="false"
@@ -16,11 +24,20 @@
         name="cohort"
         label="name"
         track-by="id"
-        ref="multiselect">
-      </multiselect>
-      <input v-model="cohort" placeholder="Cohort toevoegen" type="text" maxlength="80">
-      <button class="btn btn-primary" v-on:click="createCohort" :disabled="submitted">Voeg cohort toe</button>
-      <modulelist :cohort="selected.name"></modulelist>
+      />
+      <input 
+        v-model="cohort" 
+        placeholder="Cohort toevoegen" 
+        type="text" 
+        maxlength="80"
+      >
+      <button 
+        :disabled="submitted"
+        class="btn btn-primary"  
+        @click="createCohort"
+      >Voeg cohort toe
+      </button>
+      <modulelist :cohort="selected.name" />
     </div>
   </span>
 </template>
@@ -28,7 +45,10 @@
 import Multiselect from "vue-multiselect";
 
 export default {
-  name: "cohort",
+  name: "Cohort",
+  components: {
+    Multiselect
+  },
   data: function() {
     return {
       cohorts: [{ id: "", name: "" }],
@@ -38,9 +58,6 @@ export default {
       error: "",
       success: ""
     };
-  },
-  components: {
-    Multiselect
   },
   created: function() {
     this.getCohorts();
@@ -64,7 +81,8 @@ export default {
           this.submitted = false;
           this.getCohorts();
           this.error = "";
-          this.success = submittedCohort + " is succesvol als cohort toegevoegd!"
+          this.success =
+            submittedCohort + " is succesvol als cohort toegevoegd!";
         })
         .catch(err => {
           this.submitted = false;
