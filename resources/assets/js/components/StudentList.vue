@@ -97,7 +97,7 @@
             :href="'/student/' + student.id" 
             class="list-group-item list-group-item-action"
           >
-            {{ student.student_id }} - {{ student.first_name }} {{ student.prefix }} {{ student.last_name }} - 
+            {{ student.user_id }} - {{ student.first_name }} {{ student.prefix }} {{ student.last_name }} - 
             {{ student.cohort.name }} - {{ student.progress.toFixed(0) }}%
           </a>
         </div>
@@ -127,7 +127,7 @@ export default {
       } else if (vm.criteria === "Lastname") {
         return _.orderBy(this.students, "last_name", vm.order);
       } else if (vm.criteria === "OVNumber") {
-        return _.orderBy(this.students, "student_id", vm.order);
+        return _.orderBy(this.students, "user_id", vm.order);
       } else if (vm.criteria === "Cohort") {
         return _.orderBy(this.students, "cohort.name", vm.order);
       } else if (vm.criteria === "Progress") {

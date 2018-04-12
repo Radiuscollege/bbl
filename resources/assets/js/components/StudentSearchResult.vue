@@ -10,7 +10,7 @@
         :href="'/student/' + student.id" 
         class="list-group-item list-group-item-action"
       >
-        {{ student.student_id }} - {{ student.first_name }} {{ student.prefix }} {{ student.last_name }} - 
+        {{ student.user_id }} - {{ student.first_name }} {{ student.prefix }} {{ student.last_name }} - 
         {{ student.cohort.name }} - {{ student.progress.toFixed(0) }}%
       </a>
     </div>

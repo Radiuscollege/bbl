@@ -71,7 +71,7 @@ class StatisticsController extends Controller
     //get all modules with a mark from the active student
     public function getOwnMarks(Request $request)
     {
-        $id = Student::where('student_id', Auth::user()->getID())->first()->id;
+        $id = Student::where('user_id', Auth::user()->getID())->first()->id;
         $student = Student::with([
             'cohort.modules.studentModules' => function ($query) use ($id) {
                 $query->whereNotNull('mark')->where('student_id', $id);

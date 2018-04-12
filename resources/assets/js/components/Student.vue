@@ -179,8 +179,8 @@
                 <p v-if="module.student_modules[0].mark">
                   {{ module.student_modules[0].mark }}
                 </p>
-                <p v-if="module.student_modules[0].approved_by">
-                  ✓ {{ module.student_modules[0].approved_by }}
+                <p v-if="module.student_modules[0].teacher">
+                  ✓ {{ module.student_modules[0].teacher }}
                 </p>
                 <button 
                   type="button" 

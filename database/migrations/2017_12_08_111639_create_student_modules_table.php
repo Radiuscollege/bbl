@@ -15,8 +15,8 @@ class CreateStudentModulesTable extends Migration
     {
         Schema::create('student_modules', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('student_id')->unsigned();
-            $table->foreign('student_id')->references('id')->on('students');
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('students');
             $table->integer('module_id')->unsigned();
             $table->foreign('module_id')->references('id')->on('modules');
             $table->float('mark')->nullable();

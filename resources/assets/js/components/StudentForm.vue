@@ -34,7 +34,7 @@
           <input 
             v-validate="'required|max:20'" 
             :class="{'input': true, 'form-control': true, 'invalid': errors.has('studentNumber') }" 
-            v-model="student.student_id" 
+            v-model="student.user_id" 
             name="studentNumber" 
             type="text" 
             placeholder="OV-Nummer"
@@ -221,7 +221,7 @@ export default {
     return {
       student: {
         cohorts: [{ id: "", name: "" }],
-        student_id: "",
+        user_id: "",
         firstName: "",
         prefix: "",
         lastName: "",
@@ -272,7 +272,7 @@ export default {
       if (this.studentInfo !== undefined) {
         axios
           .put("/api/student/" + _.last(window.location.pathname.split("/")), {
-            student_id: this.student.student_id,
+            user_id: this.student.user_id,
             cohorts: this.selectedIds,
             first_name: this.student.first_name,
             prefix: this.student.prefix,
@@ -289,13 +289,13 @@ export default {
             if (err.response.data.errors === undefined) {
               this.error = err.response.data;
             } else {
-              this.error = err.response.data.errors.student_id[0];
+              this.error = err.response.data.errors.user_id[0];
             }
           });
       } else {
         axios
           .post("/api/student", {
-            student_id: this.student.student_id,
+            user_id: this.student.user_id,
             cohorts: this.selectedIds,
             first_name: this.student.first_name,
             prefix: this.student.prefix,
@@ -311,7 +311,7 @@ export default {
             if (err.response.data.errors === undefined) {
               this.error = err.response.data;
             } else {
-              this.error = err.response.data.errors.student_id[0];
+              this.error = err.response.data.errors.user_id[0];
             }
           });
       }
@@ -326,7 +326,7 @@ export default {
         this.submitted = true;
         axios
           .delete("/api/student/" + this.student.id, {
-            student_id: this.student.student_id,
+            user_id: this.student.user_id,
             cohorts: this.selectedIds,
             first_name: this.student.first_name,
             prefix: this.student.prefix,

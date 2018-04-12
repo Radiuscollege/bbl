@@ -27,7 +27,7 @@ class StudentModulesController extends Controller
      */
     public function index()
     {
-        $student = Student::where('student_id', Auth::user()->getID())->first();
+        $student = Student::where('user_id', Auth::user()->getID())->first();
         $modules = Cohort::where('id', $student->cohort_id)->with(
             [
                 'modules.studentModules' => function ($query) use ($student) {
@@ -112,7 +112,7 @@ class StudentModulesController extends Controller
         if (request('student') && Auth::user()->isTeacher()) {
             $student = request('student');
         } else {
-            $student = Student::where('student_id', Auth::user()->getID())->first()->id;
+            $student = Student::where('user_id', Auth::user()->getID())->first()->id;
         }
 
         $exists = StudentModules::where('student_id', $student)->where('module_id', $id)->first();

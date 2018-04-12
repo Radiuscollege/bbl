@@ -33,7 +33,7 @@ class DataTableSeeder extends Seeder
                 'remember_token' => null,
             ]);
             $student = Student::create([
-                'student_id' => $user->id,
+                'user_id' => $user->id,
                 'cohort_id' => $cohort->id,
                 'first_name' => $faker->firstName,
                 'prefix' => 'the',

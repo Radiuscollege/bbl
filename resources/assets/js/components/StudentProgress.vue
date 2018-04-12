@@ -293,7 +293,7 @@ export default {
       showModules: true,
       student: {
         cohorts: [{ id: "", name: "" }],
-        student_id: "",
+        user_id: "",
         firstName: "",
         prefix: "",
         lastName: "",

@@ -13,7 +13,7 @@ class Student extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'student_id', 'cohort_id', 'first_name', 'prefix', 'last_name', 'started_on', 'graduated'
+        'user_id', 'cohort_id', 'first_name', 'prefix', 'last_name', 'started_on', 'graduated'
     ];
 
     protected $hidden = [

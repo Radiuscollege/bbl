@@ -30,11 +30,11 @@ class StudentController extends Controller
         if (Auth::user()->isTeacher()) {
             return Student::with('cohort')->get();
         } else {
-            $student = Student::where('student_id', Auth::user()->getID())->first();
+            $student = Student::where('user_id', Auth::user()->getID())->first();
             $modules = Cohort::where('id', $student->cohort_id)->with(
                 [
                     'modules.studentModules' => function ($query) use ($student) {
-                        $query->where('student_id', $student->id);
+                        $query->where('user_id', $student->id);
                     }
                 ]
             )->get();
@@ -45,7 +45,7 @@ class StudentController extends Controller
 
     public function showOwn()
     {
-        return Student::where('student_id', Auth::user()->getID())->first();
+        return Student::where('user_id', Auth::user()->getID())->first();
     }
 
     //show specific student
@@ -72,7 +72,7 @@ class StudentController extends Controller
         */
         return Student::with('cohort')->where(function ($query) use ($words) {
             foreach ($words as $word) {
-                $query->orWhere('student_id', 'LIKE', '%' . $word . '%');
+                $query->orWhere('user_id', 'LIKE', '%' . $word . '%');
             }
         })->orWhere(function ($query) use ($words) {
             foreach ($words as $word) {
@@ -113,10 +113,9 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //checks if student_id doesnt exist yet
+        //checks if user_id doesnt exist yet
         $validatedData = $request->validate([
-            //its student_id instead of studentNumber cause student_id
-            'student_id' => "required|unique:students,student_id|max:20",
+            'user_id' => 'required|unique:students,user_id|max:20',
             'cohorts' => 'required',
             'first_name' => 'required|max:40',
             'prefix' => 'max:40',
@@ -124,17 +123,22 @@ class StudentController extends Controller
             'date' => 'required|date',
         ]);
 
-        //checks if the student_id exists in the user table
-        if (!User::find(request('student_id'))) {
-            return response()
-                ->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
+        $user = User::find(request('user_id'));
+        if (!$user) {
+            $user = new User();
+            $user->id = request('user_id');
+            $user->name = request('first_name')
+            . ((!request('prefix')) ? ' ' : (' ' . request('prefix') . ' ')) . request('last_name');
+            $user->email = request('user_id') . '@edu.rocwb.nl';
+            $user->type = 'student';
+            $user->save();
         }
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
 
         $student = Student::create([
-            'student_id' => request('student_id'),
+            'user_id' => request('user_id'),
             'cohort_id' => request('cohorts'),
             'first_name' => request('first_name'),
             'prefix' => request('prefix'),
@@ -169,29 +173,35 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //validates and checks if student_id already exists except the previous id
+        //validates and checks if user_id already exists except the previous id
         Validator::make($request->all(), [
-            'student_id' => ['required', 'max:20',
-            Rule::unique('students')->ignore(request('student_id'), 'student_id')],
+            'user_id' => ['required', 'max:20',
+            Rule::unique('students')->ignore(request('user_id'), 'user_id')],
             'first_name' => 'required|max:40',
             'prefix' => 'max:40',
             'last_name' => 'required|max:40',
             'date' => 'required|date',
         ])->validate();
 
-        //checks if the student_id exists in the user table
-        if (!User::find(request('student_id'))) {
-            return response()
-                ->json('Zorg ervoor dat de student met dit OV-nummer in deze applicatie al een keer is ingelogd.', 500);
-        }
+
 
         $date = strtotime(request('date'));
         $finalDate = Carbon::createFromTimestamp($date)->toDateString();
 
         $student = Student::findOrFail($id);
 
+        $user = User::find($student->user_id);
+        if ($user) {
+            $user->id = request('user_id');
+            $user->name = request('first_name')
+            . ((!request('prefix')) ? ' ' : (' ' . request('prefix') . ' ')) . request('last_name');
+            $user->email = request('user_id') . '@edu.rocwb.nl';
+            $user->type = 'student';
+            $user->save();
+        }
+
         $student->update([
-            'student_id' => request('student_id'),
+            'user_id' => request('user_id'),
             'first_name' => request('first_name'),
             'prefix' => request('prefix'),
             'last_name' => request('last_name'),

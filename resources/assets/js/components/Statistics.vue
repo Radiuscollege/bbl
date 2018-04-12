@@ -177,14 +177,12 @@
 <script>
 import Popper from "vue-popperjs";
 import "vue-popperjs/dist/css/vue-popper.css";
-import markmodal from "./MarkModal";
 import studentamountchart from "./StudentAmountChart";
 
 export default {
   name: "Statistics",
   components: {
-    popper: Popper,
-    markmodal
+    popper: Popper
   },
   data: function() {
     return {
